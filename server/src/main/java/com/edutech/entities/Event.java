@@ -9,4 +9,3 @@ public class Event {
    // write the code here
 }
 
-

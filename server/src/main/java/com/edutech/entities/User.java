@@ -8,4 +8,3 @@ public class User implements Serializable {
 
    // write the code here
 }
-
