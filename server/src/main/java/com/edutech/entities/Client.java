@@ -1,9 +1,9 @@
+
 package com.edutech.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-
-public class Client{
-    // Additional fields specific to Client if any
+@Entity
+@Table(name = "clients")
+public class Client extends User {
 }

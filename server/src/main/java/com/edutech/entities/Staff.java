@@ -1,11 +1,10 @@
+
 package com.edutech.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
-
-public class Staff {
-    
-    
-    // Additional fields specific to Staff if any
+@Entity
+@Table(name = "staff")
+public class Staff extends User {
 }
+

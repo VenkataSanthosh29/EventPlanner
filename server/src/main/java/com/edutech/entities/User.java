@@ -46,6 +46,7 @@ public class User implements Serializable{
         return email;
     }
 
+<<<<<<< HEAD
     public void setEmail(String email) {
         this.email = email;
     }
@@ -66,3 +67,7 @@ public class User implements Serializable{
         this.role = role;
     }
 }
+=======
+   // write the code here
+}
+>>>>>>> origin/main
