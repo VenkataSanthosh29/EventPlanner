@@ -9,7 +9,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET_KEY = "EDUTECH_SECRET_KEY_256_BITS";
+    private static final String SECRET_KEY = "";
     private static final long EXPIRATION_TIME = 60 * 60 * 1000;
 
     public String generateToken(String username, String role) {
