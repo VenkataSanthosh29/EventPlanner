@@ -1,1 +1,52 @@
-// write the code here
+<div class="container">
+
+  <h1>Staff Dashboard</h1>
+  <button (click)="logout()">Logout</button>
+
+  <h2>Assigned Tasks</h2>
+
+  <table>
+    <tr>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Action</th>
+    </tr>
+
+    <tr *ngFor="let task of tasks">
+      <td>{{ task.description }}</td>
+      <td>{{ task.status }}</td>
+      <td>
+        <button
+          (click)="editTask(task)"
+          [disabled]="task.status === 'Completed'">
+          Update Status
+        </button>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ✅ Status Update Form -->
+  <div *ngIf="editingTaskId">
+
+    <h3>Update Task Status</h3>
+
+    <form [formGroup]="statusForm" (ngSubmit)="updateStatus()">
+
+      <select formControlName="status">
+        <option value="">Select Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+      </select>
+
+      <button type="submit" [disabled]="statusForm.invalid">
+        Update
+      </button>
+
+      <button type="button" (click)="cancelEdit()">
+        Cancel
+      </button>
+    </form>
+
+  </div>
+
+</div>

@@ -1,1 +1,57 @@
-// write the code here
+<div class="auth-container">
+  <h2>Login</h2>
+
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        placeholder="Enter username"
+      />
+
+      <small class="error"
+        *ngIf="loginForm.get('username')?.touched &&
+               loginForm.get('username')?.invalid">
+        Username is required (alphanumeric only)
+      </small>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Enter password"
+      />
+
+      <small class="error"
+        *ngIf="loginForm.get('password')?.touched &&
+               loginForm.get('password')?.invalid">
+        Password must be at least 8 characters
+      </small>
+    </div>
+
+    <!-- Error message -->
+    <p class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <!-- Submit -->
+    <button type="submit" [disabled]="loginForm.invalid">
+      Login
+    </button>
+
+  </form>
+
+  <!-- Navigation -->
+  <p class="redirect">
+    Don’t have an account?
+    <a routerLink="/register">Register</a>
+  </p>
+</div>

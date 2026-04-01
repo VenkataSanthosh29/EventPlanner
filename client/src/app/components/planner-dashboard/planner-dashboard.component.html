@@ -1,114 +1,106 @@
 <div class="container">
-  <div class="header">
-    <h1>Planner Dashboard</h1>
-    <button (click)="logout()">Logout</button>
-  </div>
 
-  <nav>
+  <h1>Planner Dashboard</h1>
+  <button (click)="logout()">Logout</button>
+
+  <div>
     <button (click)="navigateTo('events')">Manage Events</button>
     <button (click)="navigateTo('tasks')">Manage Tasks</button>
-  </nav>
+  </div>
 
-  <div *ngIf="showEvents">
+  <!-- ================= EVENTS ================= -->
+  <section *ngIf="showEvents">
     <h2>Events</h2>
 
-    <form (ngSubmit)="createEvent()">
-      <h3>Create New Event</h3>
-      <label>
-        Title:
-        <input [(ngModel)]="newEvent.title" name="title" required>
-      </label>
-      <label>
-        Date:
-        <input [(ngModel)]="newEvent.date" name="date" required>
-      </label>
-      <label>
-        Location:
-        <input [(ngModel)]="newEvent.location" name="location" required>
-      </label>
-      <label>
-        Description:
-        <textarea [(ngModel)]="newEvent.description" name="description" required></textarea>
-      </label>
-      <label>
-        Status:
-        <select [(ngModel)]="newEvent.status" name="status" required>
-          <option value="Pending">Pending</option>
-          <option value="Completed">Completed</option>
-        </select>
-      </label>
-      <button type="submit">Create Event</button>
+    <form [formGroup]="eventForm" (ngSubmit)="submitEvent()">
+      <h3>{{ editingEventId ? 'Edit Event' : 'Create Event' }}</h3>
+
+      <input formControlName="title" placeholder="Title">
+      <input type="datetime-local" formControlName="date">
+      <input formControlName="location" placeholder="Location">
+      <textarea formControlName="description" placeholder="Description"></textarea>
+
+      <select formControlName="status">
+        <option value="">Select Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+      </select>
+
+      <button type="submit" [disabled]="eventForm.invalid">
+        {{ editingEventId ? 'Update Event' : 'Create Event' }}
+      </button>
+
+      <button type="button" *ngIf="editingEventId" (click)="resetEventForm()">
+        Cancel
+      </button>
     </form>
-    
- <h2>Event List</h2>   
-<table>
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Date</th>
-      <th>Location</th>
-      <th>Description</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let event of events">
-      <td>{{ event.title }}</td>
-      <td>{{ event.date }}</td>
-      <td>{{ event.location }}</td>
-      <td>{{ event.description }}</td>
-      <td>{{ event.status }}</td>
-      <td>
-        <button (click)="editEvent(event)">Edit</button>
-      </td>
-    </tr>
-  </tbody>
-</table>
 
-</div>
+    <table>
+      <tr>
+        <th>Title</th>
+        <th>Status</th>
+        <th>Location</th>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Action</th>
+      </tr>
 
-  <div *ngIf="showTasks">
+      <tr *ngFor="let e of events">
+        <td>{{ e.title }}</td>
+        <td>{{ e.status }}</td>
+        <td>{{e.location}}</td>
+        <td>{{ e.date | date:'dd-MM-yyyy HH:mm' }}</td>
+        <td>{{e.description}}</td>
+        <td>
+          <button
+            (click)="editEvent(e)"
+            [disabled]="e.status === 'Completed'">
+            Edit
+          </button>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <!-- ================= TASKS ================= -->
+  <section *ngIf="showTasks">
     <h2>Tasks</h2>
 
-<form (ngSubmit)="createTask()">
-<h3>Create New Task</h3>
-<label>
-Description:
-<input [(ngModel)]="newTask.description" name="description" required>
-</label>
-<label>
-Status:
-<select [(ngModel)]="newTask.status" name="status" required>
-<option value="Pending">Pending</option>
-<option value="Completed">Completed</option>
-</select>
-</label>
-<label>
-Assigned Staff:
-<select [(ngModel)]="newTask.assignedStaff" name="assignedStaff" required>
-<option *ngFor="let staff of staffs" [value]="staff.id">{{ staff.username }}</option>
-</select>
-</label>
-<button type="submit">Create Task</button>
-</form>
+    <form [formGroup]="taskForm" (ngSubmit)="submitTask()">
+      <h3>Create Task</h3>
 
-<h2>Task List</h2>
-<table>
-  <thead>
-    <tr>
-      <th>Description</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let task of tasks">
-      <td>{{ task.description }}</td>
-      <td>{{ task.status }}</td>
-    </tr>
-  </tbody>
-</table>
+      <input formControlName="description" placeholder="Description">
 
+      <select formControlName="status">
+        <option value="">Select Status</option>
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+      </select>
 
-</div>
+      <select formControlName="staffId">
+        <option value="">Select Staff</option>
+        <option *ngFor="let s of staffs" [value]="s.id">
+          {{ s.username }}
+        </option>
+      </select>
+
+      <button type="submit" [disabled]="taskForm.invalid">
+        Create Task
+      </button>
+    </form>
+
+    <table>
+      <tr>
+        <th>Description</th>
+        <th>Status</th>
+        <th>Assigned Staff</th>
+      </tr>
+      <tr *ngFor="let t of tasks">
+        <td>{{ t.description }}</td>
+        <td>{{ t.status }}</td>
+        <td>{{ t.assignedStaff?.username || 'Not Assigned' }}</td>
+      </tr>
+    </table>
+  </section>
+
 </div>

@@ -1,4 +1,7 @@
 export interface User {
-  // write the code here
-
+  id?: number;
+  username: string;
+  email?: string;
+  role?: string;
 }
+

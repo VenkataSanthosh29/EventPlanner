@@ -35,8 +35,10 @@ public class SecurityConfig {
 
                 // Role-based access
                 .antMatchers("/api/planner/**").hasRole("PLANNER")
-                .antMatchers("/api/staff/**").hasRole("STAFF")
+                .antMatchers("/api/staff/tasks**").hasRole("STAFF")
                 .antMatchers("/api/client/**").hasRole("CLIENT")
+                .antMatchers("/api/staff/all").hasAnyRole("PLANNER","STAFF")
+
 
                 .anyRequest().authenticated()
             );
