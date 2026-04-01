@@ -17,8 +17,9 @@ import { User } from '../../models/user.model';
 export class PlannerDashboardComponent implements OnInit {
 
   plannerId!: number;
+  username!:string;
 
-  showEvents = true;
+  showEvents = false;
   showTasks = false;
 
   events: Event[] = [];
@@ -43,6 +44,7 @@ export class PlannerDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    this.username = localStorage.getItem('username') || 'User';
 
     this.plannerId = Number(id);
 
@@ -157,5 +159,11 @@ export class PlannerDashboardComponent implements OnInit {
       .getAllStaff()
       .subscribe(data => this.staffs = data);
   }
+  formatStatus(status: string): string {
+  if (status === 'INITIATED') return 'Initiated';
+  if (status === 'IN_PROGRESS') return 'In Progress';
+  if (status === 'COMPLETED') return 'Completed';
+  return status;
+}
 }
 

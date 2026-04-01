@@ -1,8 +1,12 @@
+<div class="top-bar">
+  <div>
+    <h1>Staff Dashboard</h1>
+    <div class="welcome-text">Welcome, {{ username }}</div>
+  </div>
+
+  <button class="logout-btn" (click)="logout()">Logout</button>
+</div>
 <div class="container">
-
-  <h1>Staff Dashboard</h1>
-  <button (click)="logout()">Logout</button>
-
   <h2>Assigned Tasks</h2>
 
   <table>
@@ -18,7 +22,7 @@
       <td>
         <button
           (click)="editTask(task)"
-          [disabled]="task.status === 'Completed'">
+          [disabled]="task.status === 'Completed'||task.status==='COMPLETED'">
           Update Status
         </button>
       </td>
@@ -33,10 +37,9 @@
     <form [formGroup]="statusForm" (ngSubmit)="updateStatus()">
 
       <select formControlName="status">
-        <option value="">Select Status</option>
-        <option value="Pending">Pending</option>
-        <option value="Completed">Completed</option>
-      </select>
+  <option value="IN_PROGRESS">In Progress</option>
+  <option value="COMPLETED">Completed</option>
+  </select>
 
       <button type="submit" [disabled]="statusForm.invalid">
         Update

@@ -13,6 +13,7 @@ import { Event } from '../../models/event.model';
 export class ClientDashboardComponent implements OnInit {
 
   events: Event[] = [];
+  username!:string;
 
   // Track feedback editing
   editingEventId: number | null = null;
@@ -30,7 +31,7 @@ export class ClientDashboardComponent implements OnInit {
     this.feedbackForm = this.fb.group({
       feedback: ['', Validators.required]
     });
-
+    this.username = localStorage.getItem('username') || 'User';
     this.loadEvents();
   }
 

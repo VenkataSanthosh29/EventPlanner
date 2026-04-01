@@ -46,7 +46,13 @@ export class LoginComponent implements OnInit {
       tap(response => {
   if (!response) return;
 
-  const role = response.roles; // ✅ NOT response.role
+  const role = response.roles; 
+
+  
+     localStorage.setItem(
+          'username',
+          this.loginForm.value.username
+        );
 
   if (role === 'PLANNER') {
     this.router.navigate(['/planner-dashboard']);

@@ -49,5 +49,21 @@ export class AuthService {
   logout(): void {
     localStorage.clear();
   }
+
+  // ✅ Check if username exists
+checkUsernameExists(username: string) {
+  return this.http.get<boolean>(
+    `${this.baseUrl}/api/user/exists/username`,
+    { params: { username } }
+  );
+}
+
+// ✅ Check if email exists
+checkEmailExists(email: string) {
+  return this.http.get<boolean>(
+    `${this.baseUrl}/api/user/exists/email`,
+    { params: { email } }
+  );
+}
 }
 

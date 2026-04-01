@@ -14,6 +14,7 @@ export class StaffDashboardComponent implements OnInit {
 
   staffId!: number;
   tasks: Task[] = [];
+  username!:string;
 
   // Track which task is being updated
   editingTaskId: number | null = null;
@@ -33,6 +34,9 @@ export class StaffDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+    
+    this.username = localStorage.getItem('username') || 'User';
+
 
     this.staffId = Number(id);
 
@@ -52,7 +56,7 @@ export class StaffDashboardComponent implements OnInit {
 
   // ✅ Enable edit mode for a task
   editTask(task: Task): void {
-    if (task.status === 'Completed') return;
+    if (task.status === 'Completed'||task.status==="COMPLETED") return;
 
     this.editingTaskId = task.id!;
     this.statusForm.patchValue({

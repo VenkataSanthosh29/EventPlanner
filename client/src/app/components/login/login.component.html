@@ -1,7 +1,10 @@
 <div class="auth-container">
-  <h2>Login</h2>
-
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <form
+    class="auth-card"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <h2>Login</h2>
 
     <!-- Username -->
     <div class="form-group">
@@ -12,12 +15,6 @@
         formControlName="username"
         placeholder="Enter username"
       />
-
-      <small class="error"
-        *ngIf="loginForm.get('username')?.touched &&
-               loginForm.get('username')?.invalid">
-        Username is required (alphanumeric only)
-      </small>
     </div>
 
     <!-- Password -->
@@ -29,15 +26,9 @@
         formControlName="password"
         placeholder="Enter password"
       />
-
-      <small class="error"
-        *ngIf="loginForm.get('password')?.touched &&
-               loginForm.get('password')?.invalid">
-        Password must be at least 8 characters
-      </small>
     </div>
 
-    <!-- Error message -->
+    <!-- Error -->
     <p class="error-message" *ngIf="errorMessage">
       {{ errorMessage }}
     </p>
@@ -47,11 +38,10 @@
       Login
     </button>
 
+    <!-- Register link -->
+    <p class="redirect">
+      Don’t have an account?
+      <a routerLink="/register">Register</a>
+    </p>
   </form>
-
-  <!-- Navigation -->
-  <p class="redirect">
-    Don’t have an account?
-    <a routerLink="/register">Register</a>
-  </p>
 </div>

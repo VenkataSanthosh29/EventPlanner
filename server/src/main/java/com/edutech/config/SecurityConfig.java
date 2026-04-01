@@ -31,7 +31,7 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .antMatchers("/api/user/register", "/api/user/login").permitAll()
+                .antMatchers("/api/user/register", "/api/user/login","/api/user/exists/**").permitAll()
 
                 // Role-based access
                 .antMatchers("/api/planner/**").hasRole("PLANNER")
