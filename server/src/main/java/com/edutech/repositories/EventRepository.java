@@ -8,6 +8,7 @@ import com.edutech.entities.Event;
 import java.util.List;
 
 @Repository
-public interface EventRepository {
+public interface EventRepository extends JpaRepository<Event,Long> {
+   List<Event> findByPlannerId(Long plannerId);
    // write the code here
 }
