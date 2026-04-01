@@ -1,19 +1,73 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, FormGroup, FormBuilder,ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { catchError, of, tap } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { HttpClientModule } from '@angular/common/http'; // Import HttpClientModule
-
-import { User, Credentials, AuthResponse } from '../../models/user.model';
 
 @Component({
   selector: 'app-login',
-  templateUrl: './login.component.html',  
+  templateUrl: './login.component.html',
   styleUrls: ['./login.component.css'],
-  standalone: true,
-  imports: [CommonModule, FormsModule,ReactiveFormsModule, HttpClientModule]
 })
-export class LoginComponent {
-  // write the code here
+export class LoginComponent implements OnInit {
+
+  loginForm!: FormGroup;
+  errorMessage: string | null = null;
+
+  constructor(
+    private formBuilder: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.loginForm = this.formBuilder.group({
+      username: ['', [
+        Validators.required,
+        Validators.pattern(/^[a-zA-Z0-9]+$/)
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8)
+      ]]
+    });
+  }
+
+  onSubmit(): void {
+    if (this.loginForm.invalid) {
+      this.errorMessage = 'Please fill out the form correctly.';
+      return;
+    }
+
+    this.errorMessage = null;
+
+    this.authService.login(this.loginForm.value).pipe(
+
+      tap(response => {
+  if (!response) return;
+
+  const role = response.roles; 
+
+  
+     localStorage.setItem(
+          'username',
+          this.loginForm.value.username
+        );
+
+  if (role === 'PLANNER') {
+    this.router.navigate(['/planner-dashboard']);
+  } else if (role === 'STAFF') {
+    this.router.navigate(['/staff-dashboard']);
+  } else if (role === 'CLIENT') {
+    this.router.navigate(['/client-dashboard']);
+  }
+}),
+      catchError(error => {
+        console.error('Login error:', error);
+        this.errorMessage = 'Invalid username or password';
+        return of(null);
+      })
+
+    ).subscribe();
+  }
 }

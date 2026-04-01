@@ -1,1 +1,111 @@
-// write the code here
+<div class="auth-container">
+  <form
+    class="auth-card"
+    [formGroup]="registrationForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <h2>Register</h2>
+
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        placeholder="Enter username"
+      />
+
+      <small class="error" *ngIf="registrationForm.get('username')?.touched">
+        <span *ngIf="registrationForm.get('username')?.hasError('required')">
+          Username is required
+        </span>
+        <span *ngIf="registrationForm.get('username')?.hasError('usernameTaken')">
+          Username already exists
+        </span>
+      </small>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        formControlName="email"
+        placeholder="Enter email"
+      />
+
+      <small class="error" *ngIf="registrationForm.get('email')?.touched">
+        <span *ngIf="registrationForm.get('email')?.hasError('required')">
+          Email is required
+        </span>
+        <span *ngIf="registrationForm.get('email')?.hasError('email')">
+          Enter a valid email address
+        </span>
+        <span *ngIf="registrationForm.get('email')?.hasError('emailTaken')">
+          Email already exists
+        </span>
+      </small>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Enter password"
+      />
+
+      <small
+        class="error"
+        *ngIf="registrationForm.get('password')?.touched &&
+               registrationForm.get('password')?.invalid"
+      >
+        Password must be at least 8 characters
+      </small>
+    </div>
+
+    <!-- Role -->
+    <div class="form-group">
+      <label for="role">Role</label>
+      <select id="role" formControlName="role">
+        <option value="">Select role</option>
+        <option value="PLANNER">Event Planner</option>
+        <option value="STAFF">Staff</option>
+        <option value="CLIENT">Client</option>
+      </select>
+
+      <small
+        class="error"
+        *ngIf="registrationForm.get('role')?.touched &&
+               registrationForm.get('role')?.invalid"
+      >
+        Role is required
+      </small>
+    </div>
+
+    <!-- Success -->
+    <p class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </p>
+
+    <!-- Error -->
+    <p class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <!-- Submit -->
+    <button type="submit" [disabled]="registrationForm.invalid">
+      Register
+    </button>
+
+    <!-- Navigation -->
+    <p class="redirect">
+      Already have an account?
+      <a routerLink="/login">Login</a>
+    </p>
+  </form>
+</div>

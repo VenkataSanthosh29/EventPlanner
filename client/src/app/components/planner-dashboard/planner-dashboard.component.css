@@ -1,19 +1,204 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f4f6f9;
+}
+
+/* Top bar */
+.top-bar {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  padding: 16px 30px;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.top-bar h1 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.welcome-text {
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Logout */
+.logout-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+/* Main content */
 .container {
-  max-width: 800px;
+  padding: 30px;
 }
 
-h2, h3 {
-  margin-top: 20px;
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
 }
 
-.form-group {
+th {
+  background: #f0f2f8;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+td {
+  padding: 12px;
+  font-size: 14px;
+  border-top: 1px solid #eee;
+}
+
+tr:hover {
+  background: #fafafa;
+}
+
+/* Buttons */
+button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button.primary {
+  background: #667eea;
+  color: white;
+}
+
+button.secondary {
+  background: #edf2f7;
+}
+
+button.primary:hover {
+  background: #5a67d8;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.nav-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+/* Sections */
+.section-card {
+  margin-top: 30px;
+}
+
+/* Form card */
+.form-card {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.form-card h3 {
+  margin-top: 0;
   margin-bottom: 15px;
 }
 
-.table {
+/* Grid layout for forms */
+.grid-form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
+.grid-form textarea {
+  grid-column: span 2;
+}
+
+/* Form inputs */
+.grid-form input,
+.grid-form select,
+.grid-form textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Actions */
+.form-actions {
+  grid-column: span 2;
+  display: flex;
+  gap: 10px;
+}
+
+/* Table */
+.data-table {
   margin-top: 20px;
 }
 
-.btn {
-  margin-right: 5px;
+/* Buttons */
+.primary {
+  background: #667eea;
+  color: white;
+}
+
+.secondary {
+  background: #edf2f7;
+}
+
+.status-initiated { color: #d69e2e; }
+.status-in-progress { color: #3182ce; }
+.status-completed { color: #38a169; }
+/* Errors */
+.error {
+  color: #e53e3e;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+/* Invalid fields */
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #e53e3e;
+}
+
+/* Disabled buttons */
+button:disabled {
+  background: #cbd5e0 !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Grid helper */
+.grid-form > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.grid-form .full {
+  grid-column: span 2;
 }

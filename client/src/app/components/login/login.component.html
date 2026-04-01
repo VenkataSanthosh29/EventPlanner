@@ -1,1 +1,47 @@
-// write the code here
+<div class="auth-container">
+  <form
+    class="auth-card"
+    [formGroup]="loginForm"
+    (ngSubmit)="onSubmit()"
+  >
+    <h2>Login</h2>
+
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input
+        id="username"
+        type="text"
+        formControlName="username"
+        placeholder="Enter username"
+      />
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        formControlName="password"
+        placeholder="Enter password"
+      />
+    </div>
+
+    <!-- Error -->
+    <p class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </p>
+
+    <!-- Submit -->
+    <button type="submit" [disabled]="loginForm.invalid">
+      Login
+    </button>
+
+    <!-- Register link -->
+    <p class="redirect">
+      Don’t have an account?
+      <a routerLink="/register">Register</a>
+    </p>
+  </form>
+</div>

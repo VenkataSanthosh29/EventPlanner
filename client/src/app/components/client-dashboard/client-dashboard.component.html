@@ -1,1 +1,62 @@
-// write the code here
+<div class="top-bar">
+  <div>
+    <h1>Client Dashboard</h1>
+    <div class="welcome-text">Welcome, {{ username }}</div>
+  </div>
+
+  <button class="logout-btn" (click)="logout()">Logout</button>
+</div>
+<div class="container">
+
+  <h2>Events</h2>
+
+  <table>
+    <tr>
+      <th>Title</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Status</th>
+      <th>Feedback</th>
+      <th>Action</th>
+    </tr>
+
+    <tr *ngFor="let event of events">
+      <td>{{ event.title }}</td>
+      <td>{{ event.date | date:'dd-MM-yyyy HH:mm' }}</td>
+      <td>{{ event.location }}</td>
+      <td>{{ event.status }}</td>
+      <td>{{ event.feedback || 'No Feedback' }}</td>
+      <td>
+        <button (click)="editFeedback(event)">
+          {{ event.feedback ? 'Edit Feedback' : 'Add Feedback' }}
+        </button>
+      </td>
+    </tr>
+  </table>
+
+  <!-- ✅ Feedback Form -->
+  <div *ngIf="editingEventId">
+
+    <h3>Submit Feedback</h3>
+
+    <form [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()">
+
+      <textarea
+        formControlName="feedback"
+        placeholder="Enter your feedback"
+        rows="4">
+      </textarea>
+
+      <button type="submit" [disabled]="feedbackForm.invalid">
+        Submit
+      </button>
+
+      <button type="button" (click)="cancelEdit()">
+        Cancel
+      </button>
+
+    </form>
+
+  </div>
+
+</div>

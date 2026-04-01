@@ -31,12 +31,14 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
                 // Public endpoints
-                .antMatchers("/api/user/register", "/api/user/login").permitAll()
+                .antMatchers("/api/user/register", "/api/user/login","/api/user/exists/**").permitAll()
 
                 // Role-based access
                 .antMatchers("/api/planner/**").hasRole("PLANNER")
-                .antMatchers("/api/staff/**").hasRole("STAFF")
+                .antMatchers("/api/staff/tasks**").hasRole("STAFF")
                 .antMatchers("/api/client/**").hasRole("CLIENT")
+                .antMatchers("/api/staff/all").hasAnyRole("PLANNER","STAFF")
+
 
                 .anyRequest().authenticated()
             );

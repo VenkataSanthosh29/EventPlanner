@@ -28,12 +28,14 @@ public class RegisterAndLoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    // ✅ EXISTING — Registration
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
         User registeredUser = userService.registerUser(user);
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
+    // ✅ EXISTING — Login
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(
             @RequestBody LoginRequest loginRequest) {
@@ -60,5 +62,23 @@ public class RegisterAndLoginController {
                 new LoginResponse(token, user.getRole(), user.getId().intValue());
 
         return ResponseEntity.ok(response);
+    }
+
+    // ✅ NEW — Live username existence check
+    @GetMapping("/exists/username")
+    public ResponseEntity<Boolean> usernameExists(
+            @RequestParam String username) {
+
+        boolean exists = userService.existsByUsername(username);
+        return ResponseEntity.ok(exists);
+    }
+
+    // ✅ NEW — Live email existence check
+    @GetMapping("/exists/email")
+    public ResponseEntity<Boolean> emailExists(
+            @RequestParam String email) {
+
+        boolean exists = userService.existsByEmail(email);
+        return ResponseEntity.ok(exists);
     }
 }
