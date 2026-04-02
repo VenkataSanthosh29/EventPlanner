@@ -14,6 +14,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import com.edutech.dto.OtpRequest;
+import com.edutech.dto.OtpVerifyRequest;
+import com.edutech.services.EmailService;
+import com.edutech.services.OtpService;
+
 
 @RestController
 @RequestMapping("/api/user")
@@ -26,14 +31,30 @@ public class RegisterAndLoginController {
     private JwtUtil jwtUtil;
 
     @Autowired
+    private OtpService otpService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private AuthenticationManager authenticationManager;
 
     // ✅ EXISTING — Registration
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
-        User registeredUser = userService.registerUser(user);
-        return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+
+    if (!otpService.isOtpVerified(user.getEmail())) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(null);
     }
+
+    User registeredUser = userService.registerUser(user);
+
+    otpService.clearOtp(user.getEmail()); // cleanup
+
+    return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
+}
 
     // ✅ EXISTING — Login
     @PostMapping("/login")
@@ -81,4 +102,33 @@ public class RegisterAndLoginController {
         boolean exists = userService.existsByEmail(email);
         return ResponseEntity.ok(exists);
     }
+    @PostMapping("/send-otp")
+    public ResponseEntity<String> sendOtp(@RequestBody OtpRequest request) {
+
+    try {
+        String otp = otpService.generateOrResendOtp(request.getEmail());
+        emailService.sendOtpEmail(request.getEmail(), otp);
+        return ResponseEntity.ok("OTP sent successfully");
+    } catch (IllegalStateException ex) {
+        return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(ex.getMessage());
+    }
+}
+@PostMapping("/verify-otp")
+public ResponseEntity<String> verifyOtp(@RequestBody OtpVerifyRequest request) {
+
+    boolean verified = otpService.verifyOtp(
+        request.getEmail(),
+        request.getOtp()
+    );
+
+    if (!verified) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body("Invalid or expired OTP");
+    }
+
+    return ResponseEntity.ok("OTP verified");
+}
 }

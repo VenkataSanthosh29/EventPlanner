@@ -101,37 +101,38 @@ public class EventService {
     // ✅ UPDATE EVENT — WITH STATUS WORKFLOW RULES
     public Event updateEvent(Long eventId, Event eventDetails) {
 
-        Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not Found"));
+    Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new RuntimeException("Event not Found"));
 
-        String currentStatus = event.getStatus();
-        String newStatus = eventDetails.getStatus();
+    String currentStatus = event.getStatus();
+    String newStatus = eventDetails.getStatus();
 
-        // ✅ Prevent modification of completed events
-        if ("COMPLETED".equals(currentStatus)) {
-            throw new IllegalStateException("Completed event cannot be modified");
-        }
+    // ✅ Prevent modification if event is COMPLETED
+    if ("COMPLETED".equals(currentStatus)) {
+        throw new IllegalStateException("Completed event cannot be modified");
+    }
 
-        // ✅ Validate status transitions
+    // ✅ Validate transition ONLY if status is changing
+    if (newStatus != null && !newStatus.equals(currentStatus)) {
+
         if (!isValidEventStatusTransition(currentStatus, newStatus)) {
             throw new IllegalStateException(
-                    "Invalid event status transition: "
-                    + currentStatus + " → " + newStatus
+                "Invalid event status transition: "
+                + currentStatus + " → " + newStatus
             );
         }
 
-        // ✅ Update fields
-        event.setTitle(eventDetails.getTitle());
-        event.setDate(eventDetails.getDate());
-        event.setLocation(eventDetails.getLocation());
-        event.setDescription(eventDetails.getDescription());
-
-        // ✅ Status updated only if valid
         event.setStatus(newStatus);
-
-        return eventRepository.save(event);
     }
 
+    // ✅ Allow metadata updates freely
+    event.setTitle(eventDetails.getTitle());
+    event.setDate(eventDetails.getDate());
+    event.setLocation(eventDetails.getLocation());
+    event.setDescription(eventDetails.getDescription());
+
+    return eventRepository.save(event);
+}
     // ✅ GET EVENTS BY PLANNER
     public List<Event> getEventsByPlanner(Long plannerId) {
         return eventRepository.findByPlannerId(plannerId);
@@ -148,21 +149,17 @@ public class EventService {
     }
 
     // ✅ STATUS TRANSITION RULES
-    private boolean isValidEventStatusTransition(
-            String current,
-            String next
-    ) {
-        if (current == null || next == null) return false;
+    private boolean isValidEventStatusTransition(String current, String next) {
+    if (current == null || next == null) return false;
 
-        switch (current) {
-            case "INITIATED":
-                return "IN_PROGRESS".equals(next);
-            case "IN_PROGRESS":
-                return "COMPLETED".equals(next);
-            case "COMPLETED":
-                return false;
-            default:
-                return false;
-        }
+    switch (current) {
+        case "INITIATED":
+            return "IN_PROGRESS".equals(next);
+        case "IN_PROGRESS":
+            return "COMPLETED".equals(next);
+        default:
+            return false;
     }
+}
+
 }

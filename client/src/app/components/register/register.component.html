@@ -8,13 +8,8 @@
 
     <!-- Username -->
     <div class="form-group">
-      <label for="username">Username</label>
-      <input
-        id="username"
-        type="text"
-        formControlName="username"
-        placeholder="Enter username"
-      />
+      <label>Username</label>
+      <input formControlName="username" placeholder="Enter username">
 
       <small class="error" *ngIf="registrationForm.get('username')?.touched">
         <span *ngIf="registrationForm.get('username')?.hasError('required')">
@@ -28,20 +23,15 @@
 
     <!-- Email -->
     <div class="form-group">
-      <label for="email">Email</label>
-      <input
-        id="email"
-        type="email"
-        formControlName="email"
-        placeholder="Enter email"
-      />
+      <label>Email</label>
+      <input type="email" formControlName="email" placeholder="Enter email">
 
       <small class="error" *ngIf="registrationForm.get('email')?.touched">
         <span *ngIf="registrationForm.get('email')?.hasError('required')">
           Email is required
         </span>
         <span *ngIf="registrationForm.get('email')?.hasError('email')">
-          Enter a valid email address
+          Enter a valid email
         </span>
         <span *ngIf="registrationForm.get('email')?.hasError('emailTaken')">
           Email already exists
@@ -49,56 +39,89 @@
       </small>
     </div>
 
+    <!-- Send / Resend OTP -->
+    <button
+      type="button"
+      class="secondary"
+      (click)="sendOtp()"
+      [disabled]="resendCooldown > 0"
+    >
+      {{ resendCooldown > 0
+        ? 'Resend OTP in ' + resendCooldown + 's'
+        : (otpSent ? 'Resend OTP' : 'Send OTP') }}
+    </button>
+
+    <!-- OTP Section -->
+    <div class="form-group" *ngIf="otpSent">
+      <label>Enter OTP</label>
+      <input
+        type="text"
+        maxlength="6"
+        inputmode="numeric"
+        placeholder="6-digit OTP"
+        [(ngModel)]="otpValue"
+        [ngModelOptions]="{ standalone: true }"
+        name="otp"
+        (input)="onOtpInput()"
+      >
+
+      <button
+        type="button"
+        class="primary"
+        (click)="verifyOtp()"
+        [disabled]="getCleanOtp().length !== 6"
+      >
+        Verify OTP
+      </button>
+    </div>
+
     <!-- Password -->
     <div class="form-group">
-      <label for="password">Password</label>
+      <label>Password</label>
       <input
-        id="password"
         type="password"
         formControlName="password"
         placeholder="Enter password"
-      />
-
-      <small
-        class="error"
-        *ngIf="registrationForm.get('password')?.touched &&
-               registrationForm.get('password')?.invalid"
       >
+
+      <small class="error"
+        *ngIf="registrationForm.get('password')?.touched &&
+               registrationForm.get('password')?.invalid">
         Password must be at least 8 characters
       </small>
     </div>
 
     <!-- Role -->
     <div class="form-group">
-      <label for="role">Role</label>
-      <select id="role" formControlName="role">
+      <label>Role</label>
+      <select formControlName="role">
         <option value="">Select role</option>
         <option value="PLANNER">Event Planner</option>
         <option value="STAFF">Staff</option>
         <option value="CLIENT">Client</option>
       </select>
 
-      <small
-        class="error"
+      <small class="error"
         *ngIf="registrationForm.get('role')?.touched &&
-               registrationForm.get('role')?.invalid"
-      >
+               registrationForm.get('role')?.invalid">
         Role is required
       </small>
     </div>
 
-    <!-- Success -->
+    <!-- Messages -->
     <p class="success-message" *ngIf="successMessage">
       {{ successMessage }}
     </p>
 
-    <!-- Error -->
     <p class="error-message" *ngIf="errorMessage">
       {{ errorMessage }}
     </p>
 
-    <!-- Submit -->
-    <button type="submit" [disabled]="registrationForm.invalid">
+    <!-- Register -->
+    <button
+      type="submit"
+      [disabled]="registrationForm.invalid || !otpVerified"
+    >
       Register
     </button>
 

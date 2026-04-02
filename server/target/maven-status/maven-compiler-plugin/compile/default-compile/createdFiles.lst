@@ -8,6 +8,7 @@ com/edutech/repositories/EventPlannerRepository.class
 com/edutech/controllers/StaffController.class
 com/edutech/repositories/EventRepository.class
 com/edutech/jwt/JwtRequestFilter.class
+com/edutech/services/OtpService$OtpDetails.class
 com/edutech/entities/EventPlanner.class
 com/edutech/entities/Client.class
 com/edutech/services/UserService.class

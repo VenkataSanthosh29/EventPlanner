@@ -65,5 +65,20 @@ checkEmailExists(email: string) {
     { params: { email } }
   );
 }
+sendOtp(email: string) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/send-otp`,
+    { email },
+    { responseType: 'text' }
+  );
+}
+
+verifyOtp(email: string, otp: string) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/verify-otp`,
+    { email, otp },
+    { responseType: 'text' }
+  );
+}
 }
 
