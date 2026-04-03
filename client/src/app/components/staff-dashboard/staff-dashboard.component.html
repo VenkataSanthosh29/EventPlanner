@@ -11,13 +11,19 @@
 
   <table>
     <tr>
+      <th>Event ID</th>
+      <th>Event Title</th>
       <th>Description</th>
+      <th>Due Date</th>
       <th>Status</th>
       <th>Action</th>
     </tr>
 
     <tr *ngFor="let task of tasks">
+      <td>{{ task.event?.id || 'No Event' }}</td>
+      <td>{{ task.event?.title || 'No Event' }}</td>
       <td>{{ task.description }}</td>
+      <td>{{ task.event?.date || 'No Event' }}</td>
       <td>{{ task.status }}</td>
       <td>
         <button

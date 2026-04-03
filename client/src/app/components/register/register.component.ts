@@ -124,10 +124,10 @@ export class RegisterComponent implements OnInit {
 
   onSubmit(): void {
 
-    if (!this.otpVerified) {
-      this.errorMessage = 'Please verify your email before registering.';
-      return;
-    }
+    // if (!this.otpVerified) {
+    //   this.errorMessage = 'Please verify your email before registering.';
+    //   return;
+    // }
 
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();

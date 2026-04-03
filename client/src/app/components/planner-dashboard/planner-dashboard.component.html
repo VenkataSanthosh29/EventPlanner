@@ -1,3 +1,4 @@
+<!-- TOP BAR -->
 <div class="top-bar">
   <div>
     <h1>Planner Dashboard</h1>
@@ -43,6 +44,25 @@
           </small>
         </div>
 
+        <!-- ✅ Event Type -->
+        <div>
+          <select formControlName="eventTypePreset">
+            <option value="" disabled>Select Event Type</option>
+            <option *ngFor="let t of eventTypes" [value]="t">{{ t }}</option>
+          </select>
+          <small class="error" *ngIf="eventForm.get('eventTypePreset')?.touched && eventForm.get('eventTypePreset')?.invalid">
+            Event type is required
+          </small>
+        </div>
+
+        <!-- ✅ Custom Event Type if Others -->
+        <div *ngIf="eventForm.get('eventTypePreset')?.value === 'Others'">
+          <input formControlName="customEventType" placeholder="Enter custom event type">
+          <small class="error" *ngIf="eventForm.get('customEventType')?.touched && eventForm.get('customEventType')?.invalid">
+            Custom event type is required
+          </small>
+        </div>
+
         <div>
           <select formControlName="status">
             <option value="" disabled>Select Status</option>
@@ -56,11 +76,7 @@
         </div>
 
         <div class="full">
-          <textarea
-            formControlName="description"
-            placeholder="Event Description"
-            rows="2">
-          </textarea>
+          <textarea formControlName="description" placeholder="Event Description" rows="2"></textarea>
           <small class="error" *ngIf="eventForm.get('description')?.touched && eventForm.get('description')?.invalid">
             Description is required
           </small>
@@ -71,11 +87,7 @@
             {{ editingEventId ? 'Update Event' : 'Create Event' }}
           </button>
 
-          <button
-            type="button"
-            class="secondary"
-            *ngIf="editingEventId"
-            (click)="resetEventForm()">
+          <button type="button" class="secondary" *ngIf="editingEventId" (click)="resetEventForm()">
             Cancel
           </button>
         </div>
@@ -83,9 +95,10 @@
       </form>
     </div>
 
-    <table>
+    <table class="data-table">
       <tr>
         <th>Title</th>
+        <th>Type</th>
         <th>Status</th>
         <th>Location</th>
         <th>Date</th>
@@ -95,14 +108,13 @@
 
       <tr *ngFor="let e of events">
         <td>{{ e.title }}</td>
+        <td>{{ e.eventType || '—' }}</td>
         <td>{{ formatStatus(e.status) }}</td>
         <td>{{ e.location }}</td>
         <td>{{ e.date | date:'dd-MM-yyyy HH:mm' }}</td>
         <td>{{ e.description }}</td>
         <td>
-          <button (click)="editEvent(e)" [disabled]="e.status === 'COMPLETED'">
-            Edit
-          </button>
+          <button (click)="editEvent(e)" [disabled]="e.status === 'COMPLETED'">Edit</button>
         </td>
       </tr>
     </table>
@@ -117,52 +129,133 @@
 
       <form [formGroup]="taskForm" (ngSubmit)="submitTask()" class="grid-form">
 
+        <!-- Select Event -->
         <div>
-          <input formControlName="description" placeholder="Task Description">
-          <small class="error" *ngIf="taskForm.get('description')?.touched && taskForm.get('description')?.invalid">
-            Task description is required
+          <select formControlName="eventId">
+            <option value="" disabled>Select Event</option>
+            <option *ngFor="let e of events" [value]="e.id">
+              {{ e.title }} ({{ e.eventType || '—' }})
+            </option>
+          </select>
+
+          <small class="error" *ngIf="taskForm.get('eventId')?.touched && taskForm.get('eventId')?.invalid">
+            Event selection is required
           </small>
         </div>
 
+        <!-- Status (planner locked to INITIATED) -->
         <div>
           <select formControlName="status">
-            <option value="" disabled>Select Status</option>
             <option value="INITIATED">Initiated</option>
           </select>
-          <small class="error" *ngIf="taskForm.get('status')?.touched && taskForm.get('status')?.invalid">
-            Status is required
-          </small>
         </div>
 
+        <!-- ================= TEMPLATE TASKS ================= -->
+        <div class="full" *ngIf="templateTasks && templateTasks.length > 0">
+          <p class="hint">Common tasks for <b>{{ selectedEventType }}</b> (assign staff per task):</p>
+
+          <div class="template-list">
+            <div class="template-row" *ngFor="let t of templateTasks">
+              <!-- checkbox -->
+              <label class="template-item">
+                <input
+                  type="checkbox"
+                  [(ngModel)]="selectedTemplateTasks[t]"
+                  [ngModelOptions]="{ standalone: true }"
+                  [disabled]="!!(taskForm.get('eventId')?.invalid)"
+                />
+                {{ t }}
+              </label>
+
+              <!-- staff dropdown per selected task -->
+              <select
+                class="template-staff"
+                [(ngModel)]="templateTaskStaff[t]"
+                [ngModelOptions]="{ standalone: true }"
+                [disabled]="!selectedTemplateTasks[t]"
+              >
+                <option value="" disabled>Select Staff</option>
+                <option *ngFor="let s of staffs" [value]="s.id">
+                  {{ s.username }}
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="primary"
+            (click)="createTemplateTasks()"
+            [disabled]="!canCreateTemplateTasks()"
+          >
+            Create Selected Common Tasks
+          </button>
+
+          <small class="error" *ngIf="hasSelectedTemplateTasks() && !canCreateTemplateTasks()">
+            Please select staff for every selected common task.
+          </small>
+
+          <p class="hint small">Or create a custom task below (single staff).</p>
+        </div>
+
+        <!-- ================= CUSTOM TASK ================= -->
+
+        <!-- Assign Staff (for custom task only) -->
         <div>
           <select formControlName="staffId">
-            <option value="">Assign Staff</option>
+            <option value="" disabled>Assign Staff</option>
             <option *ngFor="let s of staffs" [value]="s.id">
               {{ s.username }}
             </option>
           </select>
+
           <small class="error" *ngIf="taskForm.get('staffId')?.touched && taskForm.get('staffId')?.invalid">
-            Staff selection is required
+            Staff selection is required (for custom task)
+          </small>
+        </div>
+
+        <!-- Custom Task Name -->
+        <div class="full">
+          <input
+            formControlName="description"
+            placeholder="Task Name"
+            [disabled]="!!(taskForm.get('eventId')?.invalid) || !!(taskForm.get('staffId')?.invalid)"
+          />
+
+          <small class="error"
+            *ngIf="!!(taskForm.get('eventId')?.invalid) || !!(taskForm.get('staffId')?.invalid)">
+            Select event and staff before entering a custom task.
           </small>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="primary" [disabled]="taskForm.invalid">
-            Create Task
+          <button
+            type="submit"
+            class="primary"
+            [disabled]="
+              !!(taskForm.get('eventId')?.invalid) ||
+              !!(taskForm.get('staffId')?.invalid) ||
+              !taskForm.get('description')?.value?.trim()
+            "
+          >
+            Create Custom Task
           </button>
         </div>
 
       </form>
     </div>
 
-    <table>
+    <!-- TASK TABLE -->
+    <table class="data-table">
       <tr>
+        <th>Event</th>
         <th>Description</th>
         <th>Status</th>
         <th>Assigned Staff</th>
       </tr>
 
       <tr *ngFor="let t of tasks">
+        <td>{{ t.event?.title || '—' }}</td>
         <td>{{ t.description }}</td>
         <td>{{ formatStatus(t.status) }}</td>
         <td>{{ t.assignedStaff?.username || 'Not Assigned' }}</td>

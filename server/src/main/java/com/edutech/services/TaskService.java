@@ -1,9 +1,114 @@
+
+// package com.edutech.services;
+
+// import com.edutech.entities.Event;
+// import com.edutech.entities.Staff;
+// import com.edutech.entities.Task;
+// import com.edutech.repositories.EventRepository;
+// import com.edutech.repositories.StaffRepository;
+// import com.edutech.repositories.TaskRepository;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.stereotype.Service;
+
+// import java.util.List;
+
+// @Service
+// public class TaskService {
+
+//     @Autowired
+//     private TaskRepository taskRepository;
+
+//     @Autowired
+//     private StaffRepository staffRepository;
+
+//     // ✅ NEW
+//     @Autowired
+//     private EventRepository eventRepository;
+
+//     // ✅ Create task for a specific event (planner)
+//     public Task createTaskForEvent(Long eventId, Task task) {
+
+//         Event event = eventRepository.findById(eventId)
+//                 .orElseThrow(() -> new RuntimeException("Event not Found"));
+
+//         task.setEvent(event);
+
+//         // Planner rule: status always INITIATED
+//         task.setStatus("INITIATED");
+
+//         return taskRepository.save(task);
+//     }
+
+//     public List<Task> getAllTasks() {
+//         return taskRepository.findAll();
+//     }
+
+//     public Task assignTask(Long taskId, Long staffId) {
+//         Task task = taskRepository.findById(taskId)
+//                 .orElseThrow(() -> new RuntimeException("Task not Found"));
+
+//         Staff staff = staffRepository.findById(staffId)
+//                 .orElseThrow(() -> new RuntimeException("Staff member not Found"));
+
+//         task.setAssignedStaff(staff);
+//         return taskRepository.save(task);
+//     }
+
+//     public List<Task> getAssignedTasks(Long staffId) {
+//         return taskRepository.findByAssignedStaffId(staffId);
+//     }
+
+//     // ✅ Staff updates status (enforce workflow)
+//     public Task updateTaskStatus(Long taskId, String status) {
+
+//         Task task = taskRepository.findById(taskId)
+//                 .orElseThrow(() -> new RuntimeException("Task not Found"));
+
+//         String current = task.getStatus();
+
+//         // no changes after completed
+//         if ("COMPLETED".equals(current)) {
+//             throw new IllegalStateException("Completed task cannot be modified");
+//         }
+
+//         // staff cannot set INITIATED
+//         if ("INITIATED".equals(status)) {
+//             throw new IllegalStateException("Staff cannot set INITIATED");
+//         }
+
+//         // forward-only
+//         if ("INITIATED".equals(current) && !"IN_PROGRESS".equals(status)) {
+//             throw new IllegalStateException("Task must move to IN_PROGRESS first");
+//         }
+//         if ("IN_PROGRESS".equals(current) && !"COMPLETED".equals(status)) {
+//             throw new IllegalStateException("Task can only move to COMPLETED");
+//         }
+
+//         task.setStatus(status);
+//         return taskRepository.save(task);
+//     }
+
+//     // ✅ Helper to complete remaining tasks for event
+//     public void completePendingTasksForEvent(Long eventId) {
+//         List<Task> pending = taskRepository.findByEventIdAndStatusNot(eventId, "COMPLETED");
+//         for (Task t : pending) {
+//             t.setStatus("COMPLETED");
+//         }
+//         taskRepository.saveAll(pending);
+//     }
+
+//     // ✅ Optional: tasks by event
+//     public List<Task> getTasksByEvent(Long eventId) {
+//         return taskRepository.findByEventId(eventId);
+//     }
+// }
+
 package com.edutech.services;
 
-
-
+import com.edutech.entities.Event;
 import com.edutech.entities.Staff;
 import com.edutech.entities.Task;
+import com.edutech.repositories.EventRepository;
 import com.edutech.repositories.StaffRepository;
 import com.edutech.repositories.TaskRepository;
 
@@ -14,67 +119,92 @@ import java.util.List;
 
 @Service
 public class TaskService {
+
     @Autowired
     private TaskRepository taskRepository;
+
     @Autowired
     private StaffRepository staffRepository;
-    public Task createTask(Task task){
+
+    @Autowired
+    private EventRepository eventRepository;
+
+    // ✅ Planner: Create task under a specific event
+    public Task createTaskForEvent(Long eventId, Task task) {
+
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not Found"));
+
+        task.setEvent(event);
+
+        // Planner rule: status always INITIATED
         task.setStatus("INITIATED");
+
         return taskRepository.save(task);
     }
-    public List<Task> getAllTasks(){
+
+    // ✅ Planner: Get all tasks
+    public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
-    public Task assignTask(Long taskId,Long staffId){
-        if(!taskRepository.existsById(taskId)){
-            throw new RuntimeException("Task not Found");
-        }
-        else if(!staffRepository.existsById(staffId)){
-            throw new RuntimeException("Staff not Found");
-        }
-        Task oldTask=taskRepository.findById(taskId).orElse(null);
-        oldTask.setAssignedStaff(staffRepository.findById(staffId).orElse(null));
-        return taskRepository.save(oldTask);
+
+    // ✅ Planner: Assign task to staff
+    public Task assignTask(Long taskId, Long staffId) {
+
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not Found"));
+
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new RuntimeException("Staff member not Found"));
+
+        task.setAssignedStaff(staff);
+        return taskRepository.save(task);
     }
-    public List<Task> getAssignedTasks(Long staffId){
+
+    // ✅ Staff: View assigned tasks
+    public List<Task> getAssignedTasks(Long staffId) {
         return taskRepository.findByAssignedStaffId(staffId);
     }
-    // public Task updateTaskStatus(Long taskId,String status){
-    //       if(!taskRepository.existsById(taskId)){
-    //         throw new RuntimeException("Task not Found");
-    //     }
-    //     Task oldTask=taskRepository.findById(taskId).orElse(null);
-    //     oldTask.setStatus(status);
-    //     return taskRepository.save(oldTask);
-    // }
 
-    public Task updateTaskStatus(Long taskId, String newStatus) {
+    // ✅ Staff: Update task status forward-only
+    public Task updateTaskStatus(Long taskId, String status) {
 
-    Task task = taskRepository.findById(taskId)
-            .orElseThrow(() -> new RuntimeException("Task not found"));
+        Task task = taskRepository.findById(taskId)
+                .orElseThrow(() -> new RuntimeException("Task not Found"));
 
-    String currentStatus = task.getStatus();
+        String current = task.getStatus();
 
-    // ✅ Cannot modify completed task
-    if ("COMPLETED".equals(currentStatus)) {
-        throw new IllegalStateException("Completed task cannot be modified");
-    }
+        if ("COMPLETED".equals(current)) {
+            throw new IllegalStateException("Completed task cannot be modified");
+        }
 
-    // ✅ Validate allowed transitions
-    if ("INITIATED".equals(currentStatus)) {
-        if (!"IN_PROGRESS".equals(newStatus)) {
+        if ("INITIATED".equals(status)) {
+            throw new IllegalStateException("Staff cannot set INITIATED");
+        }
+
+        if ("INITIATED".equals(current) && !"IN_PROGRESS".equals(status)) {
             throw new IllegalStateException("Task must move to IN_PROGRESS first");
         }
-    } 
-    else if ("IN_PROGRESS".equals(currentStatus)) {
-        if (!"COMPLETED".equals(newStatus)) {
+
+        if ("IN_PROGRESS".equals(current) && !"COMPLETED".equals(status)) {
             throw new IllegalStateException("Task can only move to COMPLETED");
         }
+
+        task.setStatus(status);
+        return taskRepository.save(task);
     }
 
-    task.setStatus(newStatus);
-    return taskRepository.save(task);
-}
-    // write the code here
-}
+    // ✅ Used when Event becomes COMPLETED
+    public void completePendingTasksForEvent(Long eventId) {
+        List<Task> pending = taskRepository.findByEventIdAndStatusNot(eventId, "COMPLETED");
+        for (Task t : pending) {
+            t.setStatus("COMPLETED");
+        }
+        taskRepository.saveAll(pending);
+    }
 
+    // ✅ Tasks by Event (for UI filtering)
+    public List<Task> getTasksByEvent(Long eventId) {
+        return taskRepository.findByEventId(eventId);
+    }
+}

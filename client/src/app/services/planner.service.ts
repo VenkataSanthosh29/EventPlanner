@@ -1,3 +1,80 @@
+// import { Injectable } from '@angular/core';
+// import { HttpClient } from '@angular/common/http';
+// import { Observable } from 'rxjs';
+// import { environment } from '../../environments/environment';
+
+// import { Event } from '../models/event.model';
+// import { Task } from '../models/task.model';
+
+// @Injectable({
+//   providedIn: 'root'
+// })
+// export class PlannerService {
+
+//   private baseUrl = environment.apiUrl;
+
+//   constructor(private http: HttpClient) {}
+
+//   // ---------- EVENTS ----------
+
+//   createEvent(plannerId: number, event: Event): Observable<Event> {
+//     return this.http.post<Event>(
+//       `${this.baseUrl}/api/planner/event?plannerId=${plannerId}`,
+//       event
+//     );
+//   }
+
+//   updateEvent(eventId: number, event: Event): Observable<Event> {
+//     return this.http.put<Event>(
+//       `${this.baseUrl}/api/planner/event/${eventId}`,
+//       event
+//     );
+//   }
+
+//   createTaskForEvent(eventId: number, task: any) {
+//   return this.http.post<any>(
+//     `${this.baseUrl}/api/planner/events/${eventId}/task`,
+//     task
+//   );
+// }
+
+//   getEventsByPlanner(plannerId: number): Observable<Event[]> {
+//     return this.http.get<Event[]>(
+//       `${this.baseUrl}/api/planner/events?plannerId=${plannerId}`
+//     );
+//   }
+
+//   // ---------- TASKS ----------
+
+//   createTask(task: Task): Observable<Task> {
+//     return this.http.post<Task>(
+//       `${this.baseUrl}/api/planner/task`,
+//       task
+//     );
+//   }
+
+//   assignTaskToStaff(taskId: number, staffId: number): Observable<Task> {
+//     return this.http.post<Task>(
+//       `${this.baseUrl}/api/planner/tasks/${taskId}/assign/${staffId}`,
+//       {}
+//     );
+//   }
+
+//   updateTaskStatus(taskId: number, status: string): Observable<Task> {
+//     return this.http.put<Task>(
+//       `${this.baseUrl}/api/planner/tasks/${taskId}`,
+//       null,
+//       { params: { status } }
+//     );
+//   }
+
+//   getAllTasks(): Observable<Task[]> {
+//     return this.http.get<Task[]>(
+//       `${this.baseUrl}/api/planner/tasks`
+//     );
+//   }
+// }
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -37,15 +114,17 @@ export class PlannerService {
     );
   }
 
-  // ---------- TASKS ----------
+  // ---------- TASKS (Event-mapped) ----------
 
-  createTask(task: Task): Observable<Task> {
+  // ✅ NEW: create task under a specific event
+  createTaskForEvent(eventId: number, task: Partial<Task>): Observable<Task> {
     return this.http.post<Task>(
-      `${this.baseUrl}/api/planner/task`,
+      `${this.baseUrl}/api/planner/events/${eventId}/task`,
       task
     );
   }
 
+  // ✅ assign staff after task creation
   assignTaskToStaff(taskId: number, staffId: number): Observable<Task> {
     return this.http.post<Task>(
       `${this.baseUrl}/api/planner/tasks/${taskId}/assign/${staffId}`,
@@ -53,17 +132,27 @@ export class PlannerService {
     );
   }
 
+  // ✅ get all tasks (if you still want global list)
+  getAllTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.baseUrl}/api/planner/tasks`
+    );
+  }
+
+  // ✅ OPTIONAL: get tasks for a particular event (recommended after mapping)
+  getTasksByEvent(eventId: number): Observable<Task[]> {
+    return this.http.get<Task[]>(
+      `${this.baseUrl}/api/planner/events/${eventId}/tasks`
+    );
+  }
+
+  // ---------- OPTIONAL (only if planner can update task status; else unused) ----------
+
   updateTaskStatus(taskId: number, status: string): Observable<Task> {
     return this.http.put<Task>(
       `${this.baseUrl}/api/planner/tasks/${taskId}`,
       null,
       { params: { status } }
-    );
-  }
-
-  getAllTasks(): Observable<Task[]> {
-    return this.http.get<Task[]>(
-      `${this.baseUrl}/api/planner/tasks`
     );
   }
 }

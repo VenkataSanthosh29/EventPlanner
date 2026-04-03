@@ -28,6 +28,12 @@ public class Event {
     @JoinColumn(name = "planner_id")
     private EventPlanner planner;
 
+    // inside Event entity
+private String eventType;
+
+public String getEventType() { return eventType; }
+public void setEventType(String eventType) { this.eventType = eventType; }
+
     public Long getId() {
         return id;
     }

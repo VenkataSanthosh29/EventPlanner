@@ -43,11 +43,11 @@ public class RegisterAndLoginController {
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
 
-    if (!otpService.isOtpVerified(user.getEmail())) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(null);
-    }
+    // if (!otpService.isOtpVerified(user.getEmail())) {
+    //     return ResponseEntity
+    //         .status(HttpStatus.BAD_REQUEST)
+    //         .body(null);
+    // }
 
     User registeredUser = userService.registerUser(user);
 

@@ -17,7 +17,7 @@ import { User } from '../../models/user.model';
 export class PlannerDashboardComponent implements OnInit {
 
   plannerId!: number;
-  username!:string;
+  username!: string;
 
   showEvents = false;
   showTasks = false;
@@ -30,6 +30,43 @@ export class PlannerDashboardComponent implements OnInit {
   taskForm!: FormGroup;
 
   editingEventId: number | null = null;
+
+  // ✅ Predefined event types
+  eventTypes: string[] = [
+    'Birthday',
+    'Wedding',
+    'Corporate',
+    'Concerts',
+    'Social Gatherings',
+    'Cultural',
+    'Sports',
+    'Webinars',
+    'Fundraisers',
+    'Others'
+  ];
+
+  // ✅ Common tasks per event type
+  commonTasksMap: Record<string, string[]> = {
+    Birthday: ['Book venue', 'Cake order', 'Decorations', 'Guest invitations', 'Photography'],
+    Wedding: ['Venue booking', 'Catering', 'Decoration', 'Photography', 'Music/DJ', 'Makeup'],
+    Corporate: ['Agenda preparation', 'Speaker coordination', 'Venue setup', 'AV setup', 'Refreshments'],
+    Concerts: ['Stage setup', 'Sound check', 'Lighting', 'Security', 'Ticketing'],
+    'Social Gatherings': ['Venue booking', 'Decor setup', 'Food arrangements', 'Invite guests'],
+    Cultural: ['Stage arrangement', 'Costumes', 'Props', 'Sound & lighting', 'Chief guest'],
+    Sports: ['Ground booking', 'Equipment', 'Referee', 'Medical support', 'Refreshments'],
+    Webinars: ['Speaker invite', 'Meeting link', 'Poster', 'Dry run', 'Recording'],
+    Fundraisers: ['Sponsor outreach', 'Promotion', 'Donation link', 'Venue setup', 'Accounting']
+  };
+
+  // ✅ Template task UI state
+  selectedEventType: string = '';
+  templateTasks: string[] = [];
+
+  // checkbox: taskName -> true/false
+  selectedTemplateTasks: Record<string, boolean> = {};
+
+  // ✅ NEW: staff mapping per template task: taskName -> staffId
+  templateTaskStaff: Record<string, number | ''> = {};
 
   constructor(
     private fb: FormBuilder,
@@ -44,29 +81,69 @@ export class PlannerDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
-    this.username = localStorage.getItem('username') || 'User';
 
+    this.username = localStorage.getItem('username') || 'User';
     this.plannerId = Number(id);
 
     this.initForms();
     this.loadEvents();
     this.loadTasks();
     this.loadStaffs();
+
+    // ✅ Others -> customEventType required
+    this.eventForm.get('eventTypePreset')?.valueChanges.subscribe((val: string) => {
+      const customCtrl = this.eventForm.get('customEventType');
+      if (!customCtrl) return;
+
+      if (val === 'Others') {
+        customCtrl.setValidators([Validators.required]);
+      } else {
+        customCtrl.clearValidators();
+        customCtrl.setValue('');
+      }
+      customCtrl.updateValueAndValidity();
+    });
+
+    // ✅ When event changes in task form: update templates and reset selections
+    this.taskForm.get('eventId')?.valueChanges.subscribe((eventId: any) => {
+      const selected = this.events.find(e => e.id === Number(eventId));
+      const type = (selected?.eventType || 'Others').trim();
+
+      this.selectedEventType = type;
+      this.templateTasks = this.commonTasksMap[type] ? [...this.commonTasksMap[type]] : [];
+
+      // reset selections and per-task staff mapping
+      this.selectedTemplateTasks = {};
+      this.templateTaskStaff = {};
+
+      this.templateTasks.forEach(t => {
+        this.selectedTemplateTasks[t] = false;
+        this.templateTaskStaff[t] = '';
+      });
+    });
   }
 
   initForms(): void {
+    // ✅ Event form: includes preset + custom event type
     this.eventForm = this.fb.group({
       title: ['', Validators.required],
       date: ['', Validators.required],
       location: ['', Validators.required],
       description: ['', Validators.required],
-      status: ['', Validators.required]
+      status: ['', Validators.required],
+
+      eventTypePreset: ['', Validators.required],
+      customEventType: ['']
     });
 
+    // ✅ Task form: event is required; staffId+description are for CUSTOM task only
+    // status fixed to INITIATED (planner rule)
     this.taskForm = this.fb.group({
-      description: ['', Validators.required],
-      status: ['', Validators.required],
-      staffId: ['', Validators.required]
+      eventId: ['', Validators.required],
+
+      staffId: ['', Validators.required], // ✅ used for custom task only
+      description: ['', Validators.required], // ✅ custom task name
+      status: [{ value: 'INITIATED', disabled: true }, Validators.required]
     });
   }
 
@@ -80,90 +157,159 @@ export class PlannerDashboardComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
-  /* ---------- EVENTS ---------- */
-
+  // ---------- EVENTS ----------
   loadEvents(): void {
-    this.plannerService
-      .getEventsByPlanner(this.plannerId)
+    this.plannerService.getEventsByPlanner(this.plannerId)
       .subscribe(data => this.events = data);
   }
 
   submitEvent(): void {
     if (this.eventForm.invalid) return;
 
-    const eventData: Event = this.eventForm.value;
+    const preset = this.eventForm.value.eventTypePreset;
+    const custom = this.eventForm.value.customEventType;
+
+    const finalType = preset === 'Others' ? (custom || '').trim() : preset;
+
+    const payload: Event = {
+      title: this.eventForm.value.title,
+      date: this.eventForm.value.date,
+      location: this.eventForm.value.location,
+      description: this.eventForm.value.description,
+      status: this.eventForm.value.status,
+      eventType: finalType
+    };
 
     if (this.editingEventId) {
-      this.plannerService
-        .updateEvent(this.editingEventId, eventData)
-        .subscribe(() => {
-          this.resetEventForm();
-          this.loadEvents();
-        });
+      this.plannerService.updateEvent(this.editingEventId, payload).subscribe(() => {
+        this.resetEventForm();
+        this.loadEvents();
+      });
     } else {
-      this.plannerService
-        .createEvent(this.plannerId, eventData)
-        .subscribe(() => {
-          this.resetEventForm();
-          this.loadEvents();
-        });
+      this.plannerService.createEvent(this.plannerId, payload).subscribe(() => {
+        this.resetEventForm();
+        this.loadEvents();
+      });
     }
   }
 
   editEvent(event: Event): void {
-  if (event.status === 'Completed') return;
+    if (event.status === 'COMPLETED') return;
 
-  this.editingEventId = event.id!;
+    this.editingEventId = event.id!;
 
-  this.eventForm.patchValue({
-    title: event.title,
-    location: event.location,
-    description: event.description,
-    status: event.status,
-    date: event.date ? event.date.substring(0, 16) : ''
-  });
-}
+    const existingType = (event.eventType || '').trim();
+    const isPreset = this.eventTypes.includes(existingType);
+    const preset = isPreset ? existingType : 'Others';
+    const custom = isPreset ? '' : existingType;
+
+    this.eventForm.patchValue({
+      title: event.title,
+      date: event.date ? event.date.substring(0, 16) : '',
+      location: event.location,
+      description: event.description,
+      status: event.status,
+      eventTypePreset: preset,
+      customEventType: custom
+    });
+  }
+
   resetEventForm(): void {
     this.editingEventId = null;
     this.eventForm.reset();
   }
 
-  /* ---------- TASKS (NO EDIT) ---------- */
-
+  // ---------- TASKS ----------
   loadTasks(): void {
-    this.plannerService
-      .getAllTasks()
+    this.plannerService.getAllTasks()
       .subscribe(data => this.tasks = data);
   }
 
-  submitTask(): void {
-    if (this.taskForm.invalid) return;
+  // ✅ helper: at least one checkbox selected?
+  hasSelectedTemplateTasks(): boolean {
+    return Object.values(this.selectedTemplateTasks || {}).some(v => v === true);
+  }
 
-    const { description, status, staffId } = this.taskForm.value;
-    const taskPayload: Task = { description, status };
+  // ✅ helper: all selected template tasks have staff chosen?
+  canCreateTemplateTasks(): boolean {
+    const eventIdInvalid = !!(this.taskForm.get('eventId')?.invalid);
+    if (eventIdInvalid) return false;
 
-    this.plannerService.createTask(taskPayload).subscribe(created => {
-      this.plannerService
-        .assignTaskToStaff(created.id!, staffId)
-        .subscribe(() => {
-          this.taskForm.reset();
-          this.loadTasks();
-        });
+    const selected = Object.keys(this.selectedTemplateTasks).filter(t => this.selectedTemplateTasks[t]);
+    if (selected.length === 0) return false;
+
+    // every selected task must have staffId chosen
+    return selected.every(taskName => {
+      const staffId = this.templateTaskStaff[taskName];
+      return staffId !== '' && staffId !== undefined && staffId !== null;
     });
   }
 
-  /* ---------- STAFF ---------- */
+  // ✅ Create a single CUSTOM task (requires staffId + task name)
+  submitTask(): void {
+    // custom task flow only
+    if (this.taskForm.invalid) return;
 
+    const eventId = Number(this.taskForm.get('eventId')?.value);
+    const staffId = Number(this.taskForm.get('staffId')?.value);
+    const description = (this.taskForm.get('description')?.value || '').trim();
+
+    if (!eventId || !staffId || !description) return;
+
+    const taskPayload: Partial<Task> = {
+      description,
+      status: 'INITIATED'
+    };
+
+    this.plannerService.createTaskForEvent(eventId, taskPayload).subscribe(created => {
+      this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => {
+        this.taskForm.patchValue({ description: '' });
+        this.loadTasks();
+      });
+    });
+  }
+
+  // ✅ Create MULTIPLE template tasks, each assigned to its chosen staff
+  createTemplateTasks(): void {
+    if (!this.canCreateTemplateTasks()) return;
+
+    const eventId = Number(this.taskForm.get('eventId')?.value);
+
+    const selected = Object.keys(this.selectedTemplateTasks)
+      .filter(t => this.selectedTemplateTasks[t]);
+
+    selected.forEach(taskName => {
+      const staffId = Number(this.templateTaskStaff[taskName]);
+
+      const payload: Partial<Task> = {
+        description: taskName,
+        status: 'INITIATED'
+      };
+
+      this.plannerService.createTaskForEvent(eventId, payload).subscribe(created => {
+        this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => {
+          this.loadTasks();
+        });
+      });
+    });
+
+    // reset selection for UX
+    selected.forEach(t => {
+      this.selectedTemplateTasks[t] = false;
+      this.templateTaskStaff[t] = '';
+    });
+  }
+
+  // ---------- STAFF ----------
   loadStaffs(): void {
-    this.staffService
-      .getAllStaff()
+    this.staffService.getAllStaff()
       .subscribe(data => this.staffs = data);
   }
-  formatStatus(status: string): string {
-  if (status === 'INITIATED') return 'Initiated';
-  if (status === 'IN_PROGRESS') return 'In Progress';
-  if (status === 'COMPLETED') return 'Completed';
-  return status;
-}
-}
 
+  formatStatus(status: string): string {
+    if (status === 'INITIATED') return 'Initiated';
+    if (status === 'IN_PROGRESS') return 'In Progress';
+    if (status === 'COMPLETED') return 'Completed';
+    return status;
+  }
+}

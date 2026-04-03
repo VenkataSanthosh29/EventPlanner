@@ -1,14 +1,16 @@
 package com.edutech.repositories;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import com.edutech.entities.Task;
-
+import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
-@Repository
-public interface TaskRepository extends JpaRepository<Task,Long>{
+public interface TaskRepository extends JpaRepository<Task, Long> {
+
     List<Task> findByAssignedStaffId(Long staffId);
-    // write the code here
+
+    // ✅ NEW
+    List<Task> findByEventId(Long eventId);
+
+    // ✅ NEW (for auto-complete when event completes)
+    List<Task> findByEventIdAndStatusNot(Long eventId, String status);
 }
