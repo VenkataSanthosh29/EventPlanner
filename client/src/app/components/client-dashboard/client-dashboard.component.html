@@ -68,9 +68,16 @@
           </td>
 
           <td>
-            <button class="primary" (click)="editFeedback(event)">
-              {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
-            </button>
+            <button
+              class="primary"
+              (click)="editFeedback(event)"
+              [disabled]="!canGiveFeedback(event)"
+            >
+            {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
+          </button>
+            <small class="hint" *ngIf="!canGiveFeedback(event)">
+          Only request-created events can be rated
+          </small>
           </td>
         </tr>
       </table>

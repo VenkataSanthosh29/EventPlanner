@@ -18,6 +18,8 @@ export class ClientDashboardComponent implements OnInit {
   username!: string;
   clientId!: number;
 
+  eligibleEventIds = new Set<number>();
+
   // ✅ unified tab state
   activeTab: ClientTab = 'all';
 
@@ -100,20 +102,25 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   // My Events = events created from ACCEPTED requests
-  private recomputeMyEvents(): void {
-    if (!this.events || this.events.length === 0) {
-      this.myEvents = [];
-      return;
-    }
-
-    const acceptedIds = new Set<number>(
-      (this.myRequests || [])
-        .filter(r => r.status === 'ACCEPTED' && !!r.createdEventId)
-        .map(r => Number(r.createdEventId))
-    );
-
-    this.myEvents = this.events.filter(e => !!e.id && acceptedIds.has(Number(e.id)));
+ private recomputeMyEvents(): void {
+  if (!this.events || this.events.length === 0) {
+    this.myEvents = [];
+    this.eligibleEventIds = new Set<number>();
+    return;
   }
+
+  const acceptedIds = new Set<number>(
+    (this.myRequests || [])
+      .filter(r => r.status === 'ACCEPTED' && !!r.createdEventId)
+      .map(r => Number(r.createdEventId))
+  );
+
+  // ✅ store for button enable/disable
+  this.eligibleEventIds = acceptedIds;
+
+  // ✅ My Events tab list
+  this.myEvents = this.events.filter(e => !!e.id && acceptedIds.has(Number(e.id)));
+}
 
   // ---------- Profile ----------
   loadProfile(): void {
@@ -144,19 +151,22 @@ export class ClientDashboardComponent implements OnInit {
 
   // ---------- Feedback editor ----------
   editFeedback(event: Event): void {
-    this.editingEventId = event.id || null;
+  // ✅ Do not allow feedback if event not created by this client
+  if (!this.canGiveFeedback(event)) return;
 
-    this.successMessage = null;
-    this.errorMessage = null;
+  this.editingEventId = event.id || null;
 
-    this.feedbackForm.patchValue({
-      feedback: event.feedback || '',
-      rating: event.rating ?? null
-    });
+  this.successMessage = null;
+  this.errorMessage = null;
 
-    this.feedbackForm.markAsPristine();
-    this.feedbackForm.markAsUntouched();
-  }
+  this.feedbackForm.patchValue({
+    feedback: event.feedback || '',
+    rating: event.rating ?? null
+  });
+
+  this.feedbackForm.markAsPristine();
+  this.feedbackForm.markAsUntouched();
+}
 
   submitFeedback(): void {
     if (!this.editingEventId) return;
@@ -196,4 +206,8 @@ export class ClientDashboardComponent implements OnInit {
     localStorage.clear();
     this.router.navigate(['/login']);
   }
+
+  canGiveFeedback(event: Event): boolean {
+  return !!event.id && this.eligibleEventIds.has(Number(event.id));
+}
 }
