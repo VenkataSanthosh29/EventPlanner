@@ -40,17 +40,17 @@ protected void doFilterInternal(
         FilterChain filterChain
 ) throws ServletException, IOException {
 
-    String requestPath = request.getRequestURI();
+    String path = request.getRequestURI();
 
-    // ✅ Skip JWT validation for public endpoints
-    if (requestPath.equals("/api/user/send-otp") ||
-        requestPath.equals("/api/user/verify-otp") ||
-        requestPath.equals("/api/user/login") ||
-        requestPath.equals("/api/user/register")) {
+    if (path.startsWith("/api/user/forgot-password") ||
+    path.startsWith("/api/user/login") ||
+    path.startsWith("/api/user/register") ||
+    path.startsWith("/api/user/exists")) {
 
-        filterChain.doFilter(request, response);
-        return;
+    filterChain.doFilter(request, response);
+    return;
     }
+
 
     final String authHeader = request.getHeader("Authorization");
     String username = null;

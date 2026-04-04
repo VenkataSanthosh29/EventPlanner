@@ -1,10 +1,11 @@
 package com.edutech.services;
 
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.stereotype.Service;
 
 @Service
 public class OtpService {
@@ -27,30 +28,31 @@ public class OtpService {
     private static final int MAX_SEND_ATTEMPTS = 3;
     private static final int MAX_VERIFY_ATTEMPTS = 5;
 
-    // ✅ Generate or Resend OTP
-    public String generateOrResendOtp(String email) {
+    private String key(String email, String purpose) {
+        return email + ":" + purpose;
+    }
 
-        OtpDetails details = otpStore.get(email);
+    // ✅ Generate / resend OTP with purpose (REGISTER / RESET_PASSWORD)
+    public String generateOrResendOtp(String email, String purpose) {
+
+        String k = key(email, purpose);
+        OtpDetails details = otpStore.get(k);
 
         if (details != null) {
 
-            // ❌ Too many send attempts
             if (details.sendAttempts >= MAX_SEND_ATTEMPTS) {
                 throw new IllegalStateException("OTP send limit exceeded");
             }
 
-            // ❌ Enforce 30s cooldown
             if (details.lastSentTime != null &&
                 details.lastSentTime.plusSeconds(RESEND_COOLDOWN_SECONDS)
-                    .isAfter(LocalDateTime.now())) {
+                        .isAfter(LocalDateTime.now())) {
 
-                throw new IllegalStateException(
-                    "Please wait 30 seconds before resending OTP"
-                );
+                throw new IllegalStateException("Please wait 30 seconds before resending OTP");
             }
         } else {
             details = new OtpDetails();
-            otpStore.put(email, details);
+            otpStore.put(k, details);
         }
 
         String otp = String.valueOf(100000 + random.nextInt(900000));
@@ -65,18 +67,17 @@ public class OtpService {
         return otp;
     }
 
-    // ✅ Verify OTP
-    public boolean verifyOtp(String email, String otp) {
+    // ✅ Verify OTP (purpose-specific)
+    public boolean verifyOtp(String email, String otp, String purpose) {
 
-        OtpDetails details = otpStore.get(email);
+        String k = key(email, purpose);
+        OtpDetails details = otpStore.get(k);
         if (details == null) return false;
 
-        // ❌ Expired
+        if (details.verified) return false;
         if (details.expiry.isBefore(LocalDateTime.now())) return false;
 
-        // ❌ Too many attempts
         if (details.verifyAttempts >= MAX_VERIFY_ATTEMPTS) return false;
-
         details.verifyAttempts++;
 
         if (!details.otp.equals(otp)) return false;
@@ -85,12 +86,12 @@ public class OtpService {
         return true;
     }
 
-    public boolean isOtpVerified(String email) {
-        OtpDetails details = otpStore.get(email);
+    public boolean isOtpVerified(String email, String purpose) {
+        OtpDetails details = otpStore.get(key(email, purpose));
         return details != null && details.verified;
     }
 
-    public void clearOtp(String email) {
-        otpStore.remove(email);
+    public void clearOtp(String email, String purpose) {
+        otpStore.remove(key(email, purpose));
     }
 }

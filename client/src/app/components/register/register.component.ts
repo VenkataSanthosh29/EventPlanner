@@ -58,33 +58,42 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // ===============================
+
   // OTP FLOW
-  // ===============================
 
-  sendOtp(): void {
-    const emailControl = this.registrationForm.get('email');
 
-    if (!emailControl || emailControl.invalid) {
-      emailControl?.markAsTouched();
-      this.errorMessage = 'Please enter a valid email first';
-      return;
-    }
+sendOtp(): void {
+  const emailControl = this.registrationForm.get('email');
 
-    this.errorMessage = null;
+  if (!emailControl) return;
 
-    this.authService.sendOtp(emailControl.value).subscribe({
-      next: () => {
-        this.otpSent = true;
-        this.successMessage = 'OTP sent to your email';
-        this.startResendCooldown();
-      },
-      error: err => {
-        this.errorMessage = err?.error || 'Failed to send OTP';
-      }
-    });
+  //  If invalid email format
+  if (emailControl.invalid) {
+    emailControl.markAsTouched();
+    this.errorMessage = 'Please enter a valid email first';
+    return;
   }
 
+  //  If email already exists in DB (async validator)
+  if (emailControl.hasError('emailTaken')) {
+    emailControl.markAsTouched();
+    this.errorMessage = 'Email already exists';
+    return;
+  }
+
+  this.errorMessage = null;
+
+  this.authService.sendOtp(emailControl.value).subscribe({
+    next: () => {
+      this.otpSent = true;
+      this.successMessage = 'OTP sent to your email';
+      this.startResendCooldown();
+    },
+    error: err => {
+      this.errorMessage = err?.error || 'Failed to send OTP';
+    }
+  });
+}
   /**  Remove spaces & non-digits */
   getCleanOtp(): string {
     return this.otpValue.replace(/\D/g, '');
@@ -117,17 +126,13 @@ export class RegisterComponent implements OnInit {
       }
     }, 1000);
   }
-
-  // ===============================
   // REGISTRATION
-  // ===============================
-
   onSubmit(): void {
 
-    // if (!this.otpVerified) {
-    //   this.errorMessage = 'Please verify your email before registering.';
-    //   return;
-    // }
+    if (!this.otpVerified) {
+      this.errorMessage = 'Please verify your email before registering.';
+      return;
+    }
 
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();
@@ -155,11 +160,7 @@ export class RegisterComponent implements OnInit {
       }
     });
   }
-
-  // ===============================
   // ASYNC VALIDATORS
-  // ===============================
-
   usernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
       if (!control.value) return of(null);

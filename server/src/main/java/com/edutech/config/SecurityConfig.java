@@ -36,7 +36,8 @@ public class SecurityConfig {
                     "/api/user/login",
                     "/api/user/send-otp",
                     "/api/user/verify-otp",
-                    "/api/user/exists/**"
+                    "/api/user/exists/**" ,
+                    "/api/user/forgot-password/**"
                 ).permitAll()
 
                 // Role-based access

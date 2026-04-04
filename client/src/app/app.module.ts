@@ -15,6 +15,7 @@ import { StaffDashboardComponent } from './components/staff-dashboard/staff-dash
 import { ClientDashboardComponent } from './components/client-dashboard/client-dashboard.component';
 import { PlannerProfileComponent } from './components/planner-profile/planner-profile.component';
 import { ClientRequestsComponent } from './components/client-requests/client-requests.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import { ClientRequestsComponent } from './components/client-requests/client-req
     StaffDashboardComponent,
     ClientDashboardComponent,
     PlannerProfileComponent,
-    ClientRequestsComponent
+    ClientRequestsComponent,
+    ForgotPasswordComponent,
   ],
   imports: [
     BrowserModule,

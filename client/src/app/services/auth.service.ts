@@ -80,5 +80,29 @@ verifyOtp(email: string, otp: string) {
     { responseType: 'text' }
   );
 }
+
+forgotPasswordSendOtp(email: string) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/forgot-password/send-otp`,
+    { email },
+    { responseType: 'text' }
+  );
+}
+
+forgotPasswordVerifyOtp(email: string, otp: string) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/forgot-password/verify-otp`,
+    { email, otp },
+    { responseType: 'text' }
+  );
+}
+
+resetPassword(email: string, newPassword: string) {
+  return this.http.post(
+    `${this.baseUrl}/api/user/forgot-password/reset`,
+    { email, newPassword },
+    { responseType: 'text' }
+  );
+}
 }
 

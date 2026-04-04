@@ -8,6 +8,7 @@ import { ClientDashboardComponent } from './components/client-dashboard/client-d
 
 import { PlannerProfileComponent } from './components/planner-profile/planner-profile.component';
 import { ClientRequestsComponent } from './components/client-requests/client-requests.component';
+import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
 
  
 export const routes: Routes = [
@@ -19,5 +20,6 @@ export const routes: Routes = [
   { path: 'client-dashboard', component: ClientDashboardComponent },
 { path: 'planner-profile/:plannerId', component: PlannerProfileComponent },
 { path: 'client-requests', component: ClientRequestsComponent },
+{ path: 'forgot-password', component: ForgotPasswordComponent },
 ];
 export class AppRoutingModule {}

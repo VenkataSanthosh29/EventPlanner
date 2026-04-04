@@ -1,4 +1,5 @@
 com/edutech/controllers/StaffProfileController.class
+com/edutech/dto/ResetPasswordRequestDto.class
 com/edutech/entities/Staff.class
 com/edutech/jwt/JwtUtil.class
 com/edutech/services/EventRequestService.class

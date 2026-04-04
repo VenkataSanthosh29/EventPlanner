@@ -40,16 +40,20 @@
     </div>
 
     <!-- Send / Resend OTP -->
-    <button
-      type="button"
-      class="secondary"
-      (click)="sendOtp()"
-      [disabled]="resendCooldown > 0"
-    >
-      {{ resendCooldown > 0
-        ? 'Resend OTP in ' + resendCooldown + 's'
-        : (otpSent ? 'Resend OTP' : 'Send OTP') }}
-    </button>
+   <button
+  type="button"
+  class="secondary"
+  (click)="sendOtp()"
+  [disabled]="
+    resendCooldown > 0 ||
+    registrationForm.get('email')?.invalid ||
+    registrationForm.get('email')?.hasError('emailTaken')
+  "
+>
+  {{ resendCooldown > 0
+    ? 'Resend OTP in ' + resendCooldown + 's'
+    : (otpSent ? 'Resend OTP' : 'Send OTP') }}
+</button>
 
     <!-- OTP Section -->
     <div class="form-group" *ngIf="otpSent">
