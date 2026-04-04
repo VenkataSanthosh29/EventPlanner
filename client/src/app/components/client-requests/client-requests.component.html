@@ -1,0 +1,16 @@
+<div class="container">
+  <h2>Your Requests</h2>
+  <button class="secondary" (click)="back()">Back</button>
+
+  <table>
+    <tr>
+      <th>Planner</th><th>Type</th><th>Status</th><th>Created Event Id</th>
+    </tr>
+    <tr *ngFor="let r of requests">
+      <td>{{ r.plannerName }}</td>
+      <td>{{ r.eventType }}</td>
+      <td>{{ r.status }}</td>
+      <td>{{ r.createdEventId || '—' }}</td>
+    </tr>
+  </table>
+</div>

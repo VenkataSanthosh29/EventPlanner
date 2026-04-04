@@ -13,6 +13,9 @@ import { routes } from './app.routes';
 import { AuthInterceptor } from './services/auth.interceptor';
 import { StaffDashboardComponent } from './components/staff-dashboard/staff-dashboard.component';
 import { ClientDashboardComponent } from './components/client-dashboard/client-dashboard.component';
+import { PlannerProfileComponent } from './components/planner-profile/planner-profile.component';
+import { ClientRequestsComponent } from './components/client-requests/client-requests.component';
+
 
 @NgModule({
   declarations: [
@@ -21,7 +24,9 @@ import { ClientDashboardComponent } from './components/client-dashboard/client-d
     RegisterComponent,
     PlannerDashboardComponent,
     StaffDashboardComponent,
-    ClientDashboardComponent
+    ClientDashboardComponent,
+    PlannerProfileComponent,
+    ClientRequestsComponent
   ],
   imports: [
     BrowserModule,

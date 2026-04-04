@@ -83,6 +83,10 @@ import { environment } from '../../environments/environment';
 import { Event } from '../models/event.model';
 import { Task } from '../models/task.model';
 
+
+import { EventRequest } from '../models/event-request.model';
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -155,4 +159,32 @@ export class PlannerService {
       { params: { status } }
     );
   }
+
+getRequests(plannerId: number) {
+  return this.http.get<EventRequest[]>(
+    `${this.baseUrl}/api/planner/requests`,
+    { params: { plannerId } }
+  );
+}
+
+acceptRequest(requestId: number) {
+  return this.http.post<EventRequest>(
+    `${this.baseUrl}/api/planner/requests/${requestId}/accept`,
+    {}
+  );
+}
+
+rejectRequest(requestId: number) {
+  return this.http.post<EventRequest>(
+    `${this.baseUrl}/api/planner/requests/${requestId}/reject`,
+    {}
+  );
+}
+
+getPlannerProfile(plannerId: number) {
+  return this.http.get<any>(
+    `${this.baseUrl}/api/planner/profile`,
+    { params: { plannerId } }
+  );
+}
 }

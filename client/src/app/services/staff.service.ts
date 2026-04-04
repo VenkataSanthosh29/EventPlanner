@@ -39,5 +39,11 @@ export class StaffService {
       `${this.baseUrl}/api/staff/all`
     );
   }
+  getStaffProfile(staffId: number) {
+  return this.http.get<any>(
+    `${this.baseUrl}/api/staff/profile`,
+    { params: { staffId } }
+  );
+}
 }
 

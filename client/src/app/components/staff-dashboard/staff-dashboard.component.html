@@ -4,58 +4,95 @@
     <div class="welcome-text">Welcome, {{ username }}</div>
   </div>
 
-  <button class="logout-btn" (click)="logout()">Logout</button>
-</div>
-<div class="container">
-  <h2>Assigned Tasks</h2>
+  <div class="nav-actions">
+    <button
+      class="nav-btn"
+      [class.active]="activeTab === 'tasks'"
+      type="button"
+      (click)="setTab('tasks')"
+    >
+      Tasks
+    </button>
 
-  <table>
-    <tr>
-      <th>Event ID</th>
-      <th>Event Title</th>
-      <th>Description</th>
-      <th>Due Date</th>
-      <th>Status</th>
-      <th>Action</th>
-    </tr>
+    <button
+      class="nav-btn"
+      [class.active]="activeTab === 'profile'"
+      type="button"
+      (click)="setTab('profile')"
+    >
+      Profile
+    </button>
 
-    <tr *ngFor="let task of tasks">
-      <td>{{ task.event?.id || 'No Event' }}</td>
-      <td>{{ task.event?.title || 'No Event' }}</td>
-      <td>{{ task.description }}</td>
-      <td>{{ task.event?.date || 'No Event' }}</td>
-      <td>{{ task.status }}</td>
-      <td>
-        <button
-          (click)="editTask(task)"
-          [disabled]="task.status === 'Completed'||task.status==='COMPLETED'">
-          Update Status
-        </button>
-      </td>
-    </tr>
-  </table>
-
-  <!-- ✅ Status Update Form -->
-  <div *ngIf="editingTaskId">
-
-    <h3>Update Task Status</h3>
-
-    <form [formGroup]="statusForm" (ngSubmit)="updateStatus()">
-
-      <select formControlName="status">
-  <option value="IN_PROGRESS">In Progress</option>
-  <option value="COMPLETED">Completed</option>
-  </select>
-
-      <button type="submit" [disabled]="statusForm.invalid">
-        Update
-      </button>
-
-      <button type="button" (click)="cancelEdit()">
-        Cancel
-      </button>
-    </form>
-
+    <button class="logout-btn" type="button" (click)="logout()">
+      Logout
+    </button>
   </div>
+</div>
+
+<div class="container">
+
+  <!-- ✅ ONLY ONE TAB CONTENT RENDERS -->
+  <ng-container [ngSwitch]="activeTab">
+
+    <!-- TASKS TAB -->
+    <section *ngSwitchCase="'tasks'">
+      <h2>Assigned Tasks</h2>
+
+      <table class="data-table">
+        <tr><th>Description</th><th>Status</th><th>Action</th></tr>
+
+        <tr *ngFor="let task of tasks">
+          <td>{{ task.description }}</td>
+          <td>{{ task.status }}</td>
+          <td>
+            <button (click)="editTask(task)" [disabled]="task.status === 'COMPLETED'">
+              Update
+            </button>
+          </td>
+        </tr>
+      </table>
+
+      <div *ngIf="editingTaskId" class="form-card">
+        <h3>Update Task Status</h3>
+
+        <form [formGroup]="statusForm" (ngSubmit)="updateStatus()">
+          <select formControlName="status">
+            <option value="" disabled>Select Status</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="COMPLETED">Completed</option>
+          </select>
+
+          <div class="form-actions">
+            <button class="primary" type="submit" [disabled]="statusForm.invalid">Save</button>
+            <button class="secondary" type="button" (click)="cancelEdit()">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- PROFILE TAB -->
+    <section *ngSwitchCase="'profile'">
+      <h2>My Profile</h2>
+
+      <div class="hint" *ngIf="profileLoading">Loading profile...</div>
+
+      <div class="profile-card" *ngIf="!profileLoading && staffProfile">
+        <div class="profile-row">
+          <div class="avatar">{{ (staffProfile.username || 'S').slice(0,1) | uppercase }}</div>
+          <div>
+            <h3 class="profile-name">{{ staffProfile.username }}</h3>
+            <p class="profile-meta">{{ staffProfile.email }} • {{ staffProfile.role }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FALLBACK -->
+    <section *ngSwitchDefault>
+      <h2>Assigned Tasks</h2>
+      <p class="hint">Invalid tab state. Switching to Tasks…</p>
+    </section>
+
+  </ng-container>
 
 </div>

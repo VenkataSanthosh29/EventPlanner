@@ -10,17 +10,39 @@
 // }
 
 
+// export interface Event {
+//   id?: number;
+//   title: string;
+//   date: string;
+//   location: string;
+//   description: string;
+//   status: string;
+//   feedback?: string;
+
+//   // ✅ NEW
+//   rating?: number;
+//   eventType?: string; // if you already added
+// }
+
+export interface EventPlannerInfo {
+  id?: number;
+  username?: string;
+}
+
 export interface Event {
   id?: number;
   title: string;
-  date: string;
+  date: string;          // backend LocalDateTime comes as ISO string
   location: string;
   description: string;
   status: string;
   feedback?: string;
 
-  // ✅ NEW
+  // ✅ rating + event type
   rating?: number;
-  eventType?: string; // if you already added
+  eventType?: string;
+
+  // ✅ NEW: planner info for "Planned By" column
+  planner?: EventPlannerInfo;
 }
 

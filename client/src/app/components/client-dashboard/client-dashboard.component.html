@@ -5,49 +5,189 @@
     <div class="welcome-text">Welcome, {{ username }}</div>
   </div>
 
-  <button class="logout-btn" (click)="logout()">Logout</button>
+  <div class="top-actions">
+    <button class="tab-btn" [class.active]="activeTab==='all'" type="button" (click)="setTab('all')">
+      All Events
+    </button>
+
+    <button class="tab-btn" [class.active]="activeTab==='my'" type="button" (click)="setTab('my')">
+      My Events
+    </button>
+
+    <button class="tab-btn" [class.active]="activeTab==='requests'" type="button" (click)="setTab('requests')">
+      Your Requests
+    </button>
+
+    <button class="tab-btn" [class.active]="activeTab==='profile'" type="button" (click)="setTab('profile')">
+      Profile
+    </button>
+
+    <button class="logout-btn" type="button" (click)="logout()">Logout</button>
+  </div>
 </div>
 
 <div class="container">
 
-  <h2>Events</h2>
+  <!-- ✅ Only one section renders at a time -->
+  <ng-container [ngSwitch]="activeTab">
 
-  <table class="data-table">
-    <tr>
-      <th>Title</th>
-      <th>Date</th>
-      <th>Location</th>
-      <th>Status</th>
-      <th>Feedback</th>
-      <th>Rating</th>
-      <th>Action</th>
-    </tr>
+    <!-- ============ ALL EVENTS ============ -->
+    <section *ngSwitchCase="'all'">
+      <h2>Events</h2>
 
-    <tr *ngFor="let event of events">
-      <td>{{ event.title }}</td>
-      <td>{{ event.date | date:'dd-MM-yyyy HH:mm' }}</td>
-      <td>{{ event.location }}</td>
-      <td>{{ event.status }}</td>
-      <td>{{ event.feedback || 'No Feedback' }}</td>
-      <td class="rating-cell">
-        <span class="rating-emoji">{{ getEmojiForRating(event.rating) }}</span>
-        <span class="rating-number" *ngIf="event.rating">({{ event.rating }}/5)</span>
-      </td>
-      <td>
-        <button class="primary" (click)="editFeedback(event)">
-          {{ event.feedback || event.rating ? 'Edit' : 'Add Feedback' }}
-        </button>
-      </td>
-    </tr>
-  </table>
+      <table class="data-table">
+        <tr>
+          <th>Event ID</th>
+          <th>Title</th>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Feedback</th>
+          <th>Rating</th>
+          <th>Planned By</th>
+          <th>Action</th>
+        </tr>
 
-  <!-- FEEDBACK / RATING EDITOR -->
+        <tr *ngFor="let event of events">
+          <td>{{event.id}}</td>
+          <td>{{ event.title }}</td>
+          <td>{{ event.date | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td>{{ event.location }}</td>
+          <td>{{ event.status }}</td>
+          <td>{{ event.feedback || 'No Feedback' }}</td>
+
+          <td class="rating-cell">
+            <span class="rating-emoji">{{ getEmojiForRating(event.rating) }}</span>
+            <span class="rating-number" *ngIf="event.rating">({{ event.rating }}/5)</span>
+          </td>
+
+          <td>
+            <a class="link" [routerLink]="['/planner-profile', event.planner?.id]">
+              {{ event.planner?.username || '—' }}
+            </a>
+          </td>
+
+          <td>
+            <button class="primary" (click)="editFeedback(event)">
+              {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
+            </button>
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- ============ MY EVENTS (Accepted Requests) ============ -->
+    <section *ngSwitchCase="'my'">
+      <h2>My Events (Accepted Requests)</h2>
+
+      <div class="hint" *ngIf="myEvents.length === 0">
+        No accepted events yet. Once a planner accepts your request, it will appear here.
+      </div>
+
+      <table class="data-table" *ngIf="myEvents.length > 0">
+        <tr>
+          <th>Event ID</th>
+          <th>Title</th>
+          <th>Type</th>
+          <th>Date</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Rating</th>
+          <th>Planned By</th>
+          <th>Action</th>
+        </tr>
+
+        <tr *ngFor="let event of myEvents">
+          <td>{{event.id}}</td>
+          <td>{{ event.title }}</td>
+          <td>{{ event.eventType || '—' }}</td>
+          <td>{{ event.date | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td>{{ event.location }}</td>
+          <td>{{ event.status }}</td>
+
+          <td class="rating-cell">
+            <span class="rating-emoji">{{ getEmojiForRating(event.rating) }}</span>
+            <span class="rating-number" *ngIf="event.rating">({{ event.rating }}/5)</span>
+          </td>
+
+          <td>
+            <a class="link" [routerLink]="['/planner-profile', event.planner?.id]">
+              {{ event.planner?.username || '—' }}
+            </a>
+          </td>
+
+          <td>
+            <button class="primary" (click)="editFeedback(event)">
+              {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
+            </button>
+          </td>
+        </tr>
+      </table>
+    </section>
+
+    <!-- ============ YOUR REQUESTS ============ -->
+    <section *ngSwitchCase="'requests'">
+      <h2>Your Requests</h2>
+
+      <table class="data-table" *ngIf="myRequests.length > 0; else noReq">
+        <tr>
+          <th>Planner</th>
+          <th>Type</th>
+          <th>Status</th>
+          <th>Created Event</th>
+        </tr>
+
+        <tr *ngFor="let r of myRequests">
+          <td>{{ r.plannerName }}</td>
+          <td>{{ r.eventType }}</td>
+          <td>{{ r.status }}</td>
+          <td>{{ r.createdEventId || '—' }}</td>
+        </tr>
+      </table>
+
+      <ng-template #noReq>
+        <div class="hint">No requests yet.</div>
+      </ng-template>
+    </section>
+
+    <!-- ============ PROFILE ============ -->
+    <section *ngSwitchCase="'profile'">
+      <h2>My Profile</h2>
+
+      <div class="hint" *ngIf="profileLoading">Loading profile...</div>
+
+      <div class="profile-card" *ngIf="!profileLoading && clientProfile">
+        <div class="profile-row">
+          <div class="avatar">{{ (clientProfile.username || 'C').slice(0,1) | uppercase }}</div>
+          <div>
+            <h3 class="profile-name">{{ clientProfile.username }}</h3>
+            <p class="profile-meta">{{ clientProfile.email }} • {{ clientProfile.role }}</p>
+          </div>
+        </div>
+
+        <div class="profile-stats">
+          <div class="stat">
+            <div class="stat-label">My Events</div>
+            <div class="stat-value">{{ clientProfile.acceptedRequests }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEFAULT -->
+    <section *ngSwitchDefault>
+      <h2>Events</h2>
+      <div class="hint">Invalid tab state. Switching to All Events…</div>
+    </section>
+
+  </ng-container>
+
+  <!-- ============ FEEDBACK / RATING EDITOR (global, below tabs) ============ -->
   <div *ngIf="editingEventId" class="form-card">
     <h3>Submit Feedback</h3>
 
     <form [formGroup]="feedbackForm" (ngSubmit)="submitFeedback()">
 
-      <!-- Emoji Rating Selector -->
       <div class="emoji-rating">
         <p class="hint">Select Rating:</p>
 
@@ -71,7 +211,6 @@
         </small>
       </div>
 
-      <!-- Feedback Text -->
       <textarea
         formControlName="feedback"
         rows="4"
@@ -83,17 +222,12 @@
         Feedback is required
       </small>
 
-      <!-- Messages -->
       <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
       <div class="form-actions">
-        <button class="primary" type="submit" [disabled]="feedbackForm.invalid">
-          Submit
-        </button>
-        <button class="secondary" type="button" (click)="cancelEdit()">
-          Cancel
-        </button>
+        <button class="primary" type="submit" [disabled]="feedbackForm.invalid">Submit</button>
+        <button class="secondary" type="button" (click)="cancelEdit()">Cancel</button>
       </div>
 
     </form>

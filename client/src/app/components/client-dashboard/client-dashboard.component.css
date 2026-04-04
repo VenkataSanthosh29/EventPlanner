@@ -132,9 +132,9 @@ textarea:focus {
 }
 
 .hint {
-  margin: 0 0 6px 0;
+  margin: 12px 0;
+  font-size: 13px;
   color: #555;
-  font-size: 14px;
 }
 
 .emoji-row {
@@ -195,3 +195,87 @@ textarea:focus {
   font-size: 12px;
   margin-left: 6px;
 }
+
+/* Tabs in top bar */
+.top-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.tab-btn {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.tab-btn:hover {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.tab-btn.active {
+  background: rgba(255, 255, 255, 0.40);
+  color: #1f2937;
+}
+
+/* Planned By link */
+.link {
+  color: #4f46e5;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+/* Profile card */
+.profile-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  padding: 16px;
+  max-width: 650px;
+}
+
+.profile-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.profile-name { margin: 0; font-weight: 900; }
+.profile-meta { margin: 4px 0 0; color: #6b7280; font-size: 13px; }
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.stat {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.stat-label { color: #6b7280; font-size: 12px; font-weight: 800; }
+.stat-value { font-size: 16px; font-weight: 900; margin-top: 4px; }

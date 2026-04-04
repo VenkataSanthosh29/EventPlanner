@@ -102,6 +102,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.edutech.entities.EventRequest;
+import com.edutech.services.EventRequestService;
 import java.util.List;
 
 @RestController
@@ -113,6 +115,9 @@ public class PlannerController {
 
     @Autowired
     private TaskService taskService;
+
+    @Autowired
+private EventRequestService requestService;
 
     @PostMapping("/event")
     public ResponseEntity<Event> createEvent(
@@ -172,4 +177,20 @@ public class PlannerController {
 
         return ResponseEntity.ok(taskService.getTasksByEvent(eventId));
     }
+
+
+  @GetMapping("/requests")
+public ResponseEntity<List<EventRequest>> getRequests(@RequestParam Long plannerId) {
+    return ResponseEntity.ok(requestService.getRequestsForPlanner(plannerId));
+}
+
+@PostMapping("/requests/{requestId}/accept")
+public ResponseEntity<EventRequest> accept(@PathVariable Long requestId) {
+    return ResponseEntity.ok(requestService.acceptRequest(requestId));
+}
+
+@PostMapping("/requests/{requestId}/reject")
+public ResponseEntity<EventRequest> reject(@PathVariable Long requestId) {
+    return ResponseEntity.ok(requestService.rejectRequest(requestId));
+}
 }

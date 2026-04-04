@@ -202,3 +202,170 @@ button:disabled {
 .grid-form .full {
   grid-column: span 2;
 }
+
+/* =========================
+   Requests Tab Enhancements
+   (Additions only)
+   ========================= */
+
+/* Requests section heading spacing */
+.section-card h2 {
+  margin-bottom: 12px;
+}
+
+/* Status badge styles */
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  border: 1px solid transparent;
+}
+
+/* Pending (orange) */
+.status-pending {
+  background: #fff7ed;
+  color: #c2410c;
+  border-color: #fed7aa;
+}
+
+/* Accepted (green) */
+.status-accepted {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+/* Rejected (red) */
+.status-rejected {
+  background: #fef2f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+/* Created Event Id pill */
+.event-id-pill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+/* Make request actions look cleaner */
+.request-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* Accept/Reject button sizes */
+.request-actions button {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-weight: 700;
+}
+
+/* Reject button stronger differentiation */
+.request-actions .secondary {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.request-actions .secondary:hover {
+  background: #fecaca;
+}
+
+/* Accept button hover */
+.request-actions .primary:hover {
+  filter: brightness(0.95);
+}
+
+/* Disabled request action buttons */
+.request-actions button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Improve table row hover for requests */
+.data-table tr:hover td {
+  background: #fafafa;
+}
+
+/* Improve long description readability */
+.request-desc {
+  max-width: 320px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Optional: show full description on hover via tooltip feel */
+.request-desc:hover {
+  white-space: normal;
+  overflow: visible;
+}
+
+/* Optional hint styling */
+.hint {
+  margin-top: 10px;
+  font-size: 13px;
+  color: #666;
+}
+
+/* Active tab button */
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.40);
+  color: #1f2937;
+}
+
+/* Profile card */
+.profile-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  padding: 16px;
+}
+
+.profile-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.profile-name { margin: 0; font-weight: 900; }
+.profile-meta { margin: 4px 0 0; color: #6b7280; font-size: 13px; }
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.stat {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.stat-label { color: #6b7280; font-size: 12px; font-weight: 800; }
+.stat-value { font-size: 16px; font-weight: 900; margin-top: 4px; }

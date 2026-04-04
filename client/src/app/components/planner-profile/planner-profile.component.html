@@ -1,0 +1,174 @@
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="top-left">
+    <div class="avatar">
+      {{ (profile?.plannerName || 'P').slice(0,1) | uppercase }}
+    </div>
+    <div class="title-block">
+      <h1>Planner Profile</h1>
+      <div class="subtitle">Discover planner details, ratings and events</div>
+    </div>
+  </div>
+
+  <div class="top-right">
+    <button class="btn ghost" routerLink="/client-dashboard">Back</button>
+  </div>
+</div>
+
+<div class="page">
+
+  <!-- Guard for profile loading -->
+  <ng-container *ngIf="profile as p; else loading">
+    <!-- PROFILE HEADER CARD -->
+    <div class="profile-card">
+      <div class="profile-main">
+        <div class="profile-info">
+          <h2 class="name">{{ p.plannerName }}</h2>
+
+          <div class="meta">
+            <span class="badge rating">
+              ⭐ {{ p.averageRating | number:'1.1-1' }} / 5
+            </span>
+
+            <span class="badge events">
+              📅 {{ events?.length || 0 }} Events Planned
+            </span>
+          </div>
+
+          <p class="desc">
+            View events planned by <b>{{ p.plannerName }}</b>, check overall ratings, and submit a request directly.
+          </p>
+        </div>
+
+        <div class="profile-actions">
+          <button class="btn primary" (click)="toggleRequestForm()">
+            {{ showRequestForm ? 'Close Request Form' : 'Request an Event' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- REQUEST FORM (collapsible) -->
+      <div class="request-card" *ngIf="showRequestForm">
+        <h3>Request an Event</h3>
+
+        <form [formGroup]="requestForm" (ngSubmit)="submitRequest()" class="request-form">
+          <div class="grid">
+            <div class="field">
+              <label>Event Type</label>
+              <select formControlName="eventTypePreset">
+                <option value="" disabled>Select Event Type</option>
+                <option *ngFor="let t of eventTypes" [value]="t">{{ t }}</option>
+              </select>
+              <small class="error" *ngIf="requestForm.get('eventTypePreset')?.touched && requestForm.get('eventTypePreset')?.invalid">
+                Event type is required
+              </small>
+            </div>
+
+            <div class="field" *ngIf="requestForm.get('eventTypePreset')?.value === 'Others'">
+              <label>Custom Type</label>
+              <input formControlName="customEventType" placeholder="Enter custom event type" />
+              <small class="error" *ngIf="requestForm.get('customEventType')?.touched && requestForm.get('customEventType')?.invalid">
+                Custom event type is required
+              </small>
+            </div>
+
+            <div class="field">
+              <label>Preferred Date & Time</label>
+              <input type="datetime-local" formControlName="preferredDate" />
+              <small class="hint">Optional — planner can adjust later</small>
+            </div>
+
+            <div class="field">
+              <label>Location</label>
+              <input formControlName="location" placeholder="Enter location" />
+              <small class="hint">Optional</small>
+            </div>
+          </div>
+
+          <div class="field full">
+            <label>Request Description</label>
+            <textarea formControlName="description" rows="3" placeholder="Describe what you want (budget, preferences, guests, etc.)"></textarea>
+            <small class="error" *ngIf="requestForm.get('description')?.touched && requestForm.get('description')?.invalid">
+              Description is required
+            </small>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary" type="submit" [disabled]="requestForm.invalid">
+              Submit Request
+            </button>
+            <button class="btn ghost" type="button" (click)="toggleRequestForm()">
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- EVENTS LIST -->
+    <div class="card">
+      <div class="card-header">
+        <h3>Events Planned by {{ p.plannerName }}</h3>
+        <span class="muted">Showing latest events planned by this planner</span>
+      </div>
+
+      <div class="table-wrap" *ngIf="events && events.length > 0; else noEvents">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Rating</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let e of events">
+              <td class="title-cell">{{ e.title }}</td>
+              <td>{{ e.eventType || '—' }}</td>
+              <td>
+                <span class="status"
+                      [ngClass]="{
+                        's-init': e.status === 'INITIATED',
+                        's-progress': e.status === 'IN_PROGRESS',
+                        's-done': e.status === 'COMPLETED'
+                      }">
+                  {{ e.status }}
+                </span>
+              </td>
+              <td>{{ e.date | date:'dd-MM-yyyy HH:mm' }}</td>
+              <td>
+                <span class="rating-pill" *ngIf="e.rating; else noRating">
+                  ⭐ {{ e.rating }}/5
+                </span>
+                <ng-template #noRating>—</ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #noEvents>
+        <div class="empty">
+          <div class="empty-icon">📭</div>
+          <div class="empty-text">
+            No events found for this planner yet.
+          </div>
+        </div>
+      </ng-template>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <div>
+        <h3>Loading planner profile…</h3>
+        <p class="muted">Please wait a moment</p>
+      </div>
+    </div>
+  </ng-template>
+
+</div>

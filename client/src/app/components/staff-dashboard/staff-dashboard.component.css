@@ -95,3 +95,70 @@ button.primary:hover {
 .status-initiated { color: #d69e2e; }
 .status-in-progress { color: #3182ce; }
 .status-completed { color: #38a169; }
+
+/* Active tab button */
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.40);
+  color: #1f2937;
+}
+
+/* Profile card */
+.profile-card {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.06);
+  padding: 16px;
+}
+
+.profile-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #eef2ff;
+  color: #3730a3;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.profile-name { margin: 0; font-weight: 900; }
+.profile-meta { margin: 4px 0 0; color: #6b7280; font-size: 13px; }
+
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.stat {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.stat-label { color: #6b7280; font-size: 12px; font-weight: 800; }
+.stat-value { font-size: 16px; font-weight: 900; margin-top: 4px; }
+
+.nav-btn.active {
+  background: rgba(255, 255, 255, 0.40);
+  color: #1f2937;
+  font-weight: 800;
+}
+
+.nav-btn {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.nav-btn:focus {
+  outline: none;
+}
