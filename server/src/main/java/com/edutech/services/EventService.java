@@ -98,6 +98,25 @@ public class EventService {
         return eventRepository.save(event);
     }
 
+    public Event updateFeedbackAndRating(Long eventId, String feedback, Integer rating) {
+
+    Event event = eventRepository.findById(eventId)
+            .orElseThrow(() -> new RuntimeException("Event not Found"));
+
+    if (feedback != null) {
+        event.setFeedback(feedback);
+    }
+
+    if (rating != null) {
+        if (rating < 1 || rating > 5) {
+            throw new IllegalArgumentException("Rating must be between 1 and 5");
+        }
+        event.setRating(rating);
+    }
+
+    return eventRepository.save(event);
+}
+
     // ✅ STATUS TRANSITION RULES (forward-only)
     private boolean isValidEventStatusTransition(String current, String next) {
         if (current == null || next == null) return false;

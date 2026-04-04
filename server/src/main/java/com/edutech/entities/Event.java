@@ -34,6 +34,11 @@ private String eventType;
 public String getEventType() { return eventType; }
 public void setEventType(String eventType) { this.eventType = eventType; }
 
+private Integer rating;
+
+public Integer getRating() { return rating; }
+public void setRating(Integer rating) { this.rating = rating; }
+
     public Long getId() {
         return id;
     }

@@ -24,7 +24,6 @@ body {
   opacity: 0.9;
 }
 
-/* Logout */
 .logout-btn {
   background: rgba(255, 255, 255, 0.2);
   border: none;
@@ -38,56 +37,161 @@ body {
   background: rgba(255, 255, 255, 0.35);
 }
 
-/* Main content */
 .container {
   padding: 30px;
 }
 
-/* Tables */
-table {
+/* Table */
+.data-table {
   width: 100%;
   border-collapse: collapse;
   background: white;
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
 }
 
-th {
+.data-table th {
   background: #f0f2f8;
   padding: 12px;
   text-align: left;
   font-size: 14px;
 }
 
-td {
+.data-table td {
   padding: 12px;
   font-size: 14px;
   border-top: 1px solid #eee;
 }
 
-tr:hover {
+.data-table tr:hover {
   background: #fafafa;
 }
 
 /* Buttons */
-button {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
 button.primary {
   background: #667eea;
   color: white;
-}
-
-button.secondary {
-  background: #edf2f7;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 button.primary:hover {
   background: #5a67d8;
+}
+
+button.secondary {
+  background: #edf2f7;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Form card */
+.form-card {
+  background: white;
+  padding: 18px;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+  max-width: 650px;
+}
+
+textarea {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  font-size: 14px;
+}
+
+textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+}
+
+.form-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Emoji rating */
+.emoji-rating {
+  margin-bottom: 10px;
+}
+
+.hint {
+  margin: 0 0 6px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+.emoji-row {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.emoji-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 2px solid #e2e8f0;
+  background: #fff;
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.emoji-btn:hover {
+  transform: scale(1.05);
+  border-color: #667eea;
+}
+
+.emoji-btn.selected {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+.error {
+  color: #e53e3e;
+  font-size: 12px;
+}
+
+.error-message {
+  color: #e53e3e;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.success-message {
+  color: #38a169;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+/* Table rating display */
+.rating-cell {
+  white-space: nowrap;
+}
+
+.rating-emoji {
+  font-size: 18px;
+}
+
+.rating-number {
+  color: #666;
+  font-size: 12px;
+  margin-left: 6px;
 }
