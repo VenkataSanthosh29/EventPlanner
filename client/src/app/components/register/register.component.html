@@ -1,138 +1,159 @@
-<div class="auth-container">
-  <form
-    class="auth-card"
-    [formGroup]="registrationForm"
-    (ngSubmit)="onSubmit()"
-  >
-    <h2>Register</h2>
+<div class="auth-root" [ngClass]="currentTheme" (mousemove)="onMouseMove($event)">
 
-    <!-- Username -->
-    <div class="form-group">
-      <label>Username</label>
-      <input formControlName="username" placeholder="Enter username">
+  <!-- Cursor Orb -->
+  <div class="auth-orb" #authOrb></div>
 
-      <small class="error" *ngIf="registrationForm.get('username')?.touched">
-        <span *ngIf="registrationForm.get('username')?.hasError('required')">
-          Username is required
-        </span>
-        <span *ngIf="registrationForm.get('username')?.hasError('usernameTaken')">
-          Username already exists
-        </span>
-      </small>
+  <!-- Atmospheric Background -->
+  <div class="dot-layer dot-layer-back"></div>
+  <div class="dot-layer dot-layer-front"></div>
+
+  <!-- Theme Toggle -->
+  <button class="auth-theme-toggle" type="button" (click)="toggleTheme()" aria-label="Toggle theme">
+    <span class="auth-theme-thumb" [ngClass]="currentTheme">
+      <span class="auth-theme-icon">{{ currentTheme === 'night' ? '🌙' : '☀️' }}</span>
+    </span>
+  </button>
+
+  <!-- Main Layout -->
+  <div class="auth-container-outer">
+
+    <!-- Left Panel -->
+    <div class="auth-side">
+      <span class="auth-badge">Create Account</span>
+      <h1>Join the event experience.</h1>
+      <p class="auth-sub">
+        Set up your account in seconds and start planning, managing, or attending incredible events today.
+      </p>
     </div>
 
-    <!-- Email -->
-    <div class="form-group">
-      <label>Email</label>
-      <input type="email" formControlName="email" placeholder="Enter email">
+    <!-- Card Shell -->
+    <div class="auth-card-shell">
+      <div class="auth-card">
 
-      <small class="error" *ngIf="registrationForm.get('email')?.touched">
-        <span *ngIf="registrationForm.get('email')?.hasError('required')">
-          Email is required
-        </span>
-        <span *ngIf="registrationForm.get('email')?.hasError('email')">
-          Enter a valid email
-        </span>
-        <span *ngIf="registrationForm.get('email')?.hasError('emailTaken')">
-          Email already exists
-        </span>
-      </small>
+        <h2>Register</h2>
+
+        <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+
+          <!-- Username -->
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" formControlName="username" placeholder="Enter username" autocomplete="username" />
+            <small class="error" *ngIf="registrationForm.get('username')?.touched">
+              <span *ngIf="registrationForm.get('username')?.hasError('required')">Username is required</span>
+              <span *ngIf="registrationForm.get('username')?.hasError('usernameTaken')">Username already exists</span>
+            </small>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label for="email">Email</label>
+            <input id="email" type="email" formControlName="email" placeholder="Enter email" autocomplete="email" />
+            <small class="error" *ngIf="registrationForm.get('email')?.touched">
+              <span *ngIf="registrationForm.get('email')?.hasError('required')">Email is required</span>
+              <span *ngIf="registrationForm.get('email')?.hasError('email')">Enter a valid email</span>
+              <span *ngIf="registrationForm.get('email')?.hasError('emailTaken')">Email already exists</span>
+            </small>
+          </div>
+
+          <!-- Send / Resend OTP -->
+          <button
+            type="button"
+            class="secondary"
+            (click)="sendOtp()"
+            [disabled]="
+              resendCooldown > 0 ||
+              registrationForm.get('email')?.invalid ||
+              registrationForm.get('email')?.hasError('emailTaken')
+            ">
+            {{ resendCooldown > 0
+                ? 'Resend OTP in ' + resendCooldown + 's'
+                : (otpSent ? 'Resend OTP' : 'Send OTP') }}
+          </button>
+
+          <!-- OTP Section -->
+          <div class="form-group" *ngIf="otpSent">
+            <label for="otp">Verification Code</label>
+            <input
+              id="otp"
+              name="otp"
+              type="text"
+              maxlength="6"
+              inputmode="numeric"
+              placeholder="• • • • • •"
+              [(ngModel)]="otpValue"
+              [ngModelOptions]="{ standalone: true }"
+              (input)="onOtpInput()"
+              autocomplete="one-time-code"
+            />
+
+            <!-- Live digit progress dots -->
+            <div class="otp-dots">
+              <div *ngFor="let i of [0,1,2,3,4,5]"
+                class="otp-dot"
+                [class.filled]="getCleanOtp().length > i">
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="primary"
+              (click)="verifyOtp()"
+              [disabled]="getCleanOtp().length !== 6">
+              Verify OTP
+            </button>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label for="password">Password</label>
+            <div class="pw-wrapper">
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                formControlName="password"
+                placeholder="Enter password"
+                autocomplete="new-password"
+              />
+              <button type="button" class="pw-eye-btn" (click)="togglePassword()" aria-label="Toggle password">
+                {{ showPassword ? '🙈' : '👁️' }}
+              </button>
+            </div>
+            <small class="error"
+              *ngIf="registrationForm.get('password')?.touched && registrationForm.get('password')?.invalid">
+              Password must be at least 8 characters
+            </small>
+          </div>
+
+          <!-- Role -->
+          <div class="form-group">
+            <label for="role">Role</label>
+            <select id="role" formControlName="role">
+              <option value="">Select role</option>
+              <option value="PLANNER">Event Planner</option>
+              <option value="STAFF">Staff</option>
+              <option value="CLIENT">Client</option>
+            </select>
+            <small class="error"
+              *ngIf="registrationForm.get('role')?.touched && registrationForm.get('role')?.invalid">
+              Role is required
+            </small>
+          </div>
+
+          <!-- Messages -->
+          <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
+          <p class="error-message"   *ngIf="errorMessage">{{ errorMessage }}</p>
+
+          <!-- Submit -->
+          <button type="submit" [disabled]="registrationForm.invalid">Register</button>
+
+          <!-- Redirect -->
+          <p class="redirect">
+            Already have an account? <a routerLink="/login">Login</a>
+          </p>
+
+        </form>
+      </div>
     </div>
 
-    <!-- Send / Resend OTP -->
-   <button
-  type="button"
-  class="secondary"
-  (click)="sendOtp()"
-  [disabled]="
-    resendCooldown > 0 ||
-    registrationForm.get('email')?.invalid ||
-    registrationForm.get('email')?.hasError('emailTaken')
-  "
->
-  {{ resendCooldown > 0
-    ? 'Resend OTP in ' + resendCooldown + 's'
-    : (otpSent ? 'Resend OTP' : 'Send OTP') }}
-</button>
-
-    <!-- OTP Section -->
-    <div class="form-group" *ngIf="otpSent">
-      <label>Enter OTP</label>
-      <input
-        type="text"
-        maxlength="6"
-        inputmode="numeric"
-        placeholder="6-digit OTP"
-        [(ngModel)]="otpValue"
-        [ngModelOptions]="{ standalone: true }"
-        name="otp"
-        (input)="onOtpInput()"
-      >
-
-      <button
-        type="button"
-        class="primary"
-        (click)="verifyOtp()"
-        [disabled]="getCleanOtp().length !== 6"
-      >
-        Verify OTP
-      </button>
-    </div>
-
-    <!-- Password -->
-    <div class="form-group">
-      <label>Password</label>
-      <input
-        type="password"
-        formControlName="password"
-        placeholder="Enter password"
-      >
-
-      <small class="error"
-        *ngIf="registrationForm.get('password')?.touched &&
-               registrationForm.get('password')?.invalid">
-        Password must be at least 8 characters
-      </small>
-    </div>
-
-    <!-- Role -->
-    <div class="form-group">
-      <label>Role</label>
-      <select formControlName="role">
-        <option value="">Select role</option>
-        <option value="PLANNER">Event Planner</option>
-        <option value="STAFF">Staff</option>
-        <option value="CLIENT">Client</option>
-      </select>
-
-      <small class="error"
-        *ngIf="registrationForm.get('role')?.touched &&
-               registrationForm.get('role')?.invalid">
-        Role is required
-      </small>
-    </div>
-
-    <!-- Messages -->
-    <p class="success-message" *ngIf="successMessage">
-      {{ successMessage }}
-    </p>
-
-    <p class="error-message" *ngIf="errorMessage">
-      {{ errorMessage }}
-    </p>
-
-    <!-- Register -->
-    <button
-      type="submit"
-      [disabled]="registrationForm.invalid"
-    >
-      Register
-    </button>
-
-    <!-- Navigation -->
-    <p class="redirect">
-      Already have an account?
-      <a routerLink="/login">Login</a>
-    </p>
-  </form>
+  </div>
 </div>

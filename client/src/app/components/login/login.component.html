@@ -1,51 +1,91 @@
-<div class="auth-container">
-  <form
-    class="auth-card"
-    [formGroup]="loginForm"
-    (ngSubmit)="onSubmit()"
+<div class="ep-login-root" [ngClass]="currentTheme">
+  <div class="ep-login-orb"></div>
+  <div class="ep-dot-layer ep-dot-layer-back"></div>
+  <div class="ep-dot-layer ep-dot-layer-front"></div>
+
+  <button
+    type="button"
+    class="ep-theme-toggle"
+    (click)="toggleTheme()"
+    [attr.aria-label]="currentTheme === 'night' ? 'Switch to day mode' : 'Switch to night mode'"
   >
-    <h2>Login</h2>
+    <span class="ep-theme-thumb" [ngClass]="currentTheme">
+      <span class="ep-theme-icon" *ngIf="currentTheme === 'night'">🌙</span>
+      <span class="ep-theme-icon" *ngIf="currentTheme === 'day'">☀</span>
+    </span>
+  </button>
 
-    <!-- Username -->
-    <div class="form-group">
-      <label for="username">Username</label>
-      <input
-        id="username"
-        type="text"
-        formControlName="username"
-        placeholder="Enter username"
-      />
+  <div class="ep-login-container">
+    <div class="ep-login-side">
+      <p class="ep-badge">Event Planner</p>
+      <h1>Light up your next event.</h1>
+      <p class="ep-sub">
+        Manage weddings, corporate meets, concerts and more from a single powerful dashboard.
+      </p>
     </div>
 
-    <!-- Password -->
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input
-        id="password"
-        type="password"
-        formControlName="password"
-        placeholder="Enter password"
-      />
+    <div class="ep-card-shell">
+      <form
+        class="ep-auth-card"
+        [formGroup]="loginForm"
+        (ngSubmit)="onSubmit()"
+      >
+        <h2>Sign in to continue</h2>
 
-        <p class="redirect a">
-  <a routerLink="/forgot-password">Forgot Password?</a>
-</p>
+        <div class="ep-form-group">
+          <label for="username">Username</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            placeholder="Enter username"
+          />
+        </div>
+
+        <div class="ep-form-group">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <label for="password">Password</label>
+            <a routerLink="/forgot-password" class="ep-forgot-link" style="font-size: 0.75rem; color: #60a5fa; text-decoration: none;">Forgot?</a>
+          </div>
+          
+          <div class="ep-password-wrapper" [class.revealing]="isPasswordRevealing">
+            <input
+              id="password"
+              [type]="passwordVisible ? 'text' : 'password'"
+              formControlName="password"
+              placeholder="Enter password"
+              (input)="stopPasswordRevealAnimation()"
+            />
+
+            <button
+              type="button"
+              class="ep-eye-btn"
+              (click)="onRevealClick()"
+              aria-label="Reveal password"
+            >
+              <span class="ep-eye-shell">
+                <span class="ep-eye" [ngClass]="{ open: passwordVisible }"></span>
+                <span class="ep-eye-particle ep-eye-p1"></span>
+                <span class="ep-eye-particle ep-eye-p2"></span>
+                <span class="ep-eye-particle ep-eye-p3"></span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <p class="ep-error" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </p>
+
+        <button type="submit" [disabled]="loginForm.invalid">
+          Enter the venue
+        </button>
+
+        <p class="ep-redirect">
+          New here?
+          <a routerLink="/register">Create account</a>
+        </p>
+      </form>
     </div>
-
-    <!-- Error -->
-    <p class="error-message" *ngIf="errorMessage">
-      {{ errorMessage }}
-    </p>
-
-    <!-- Submit -->
-    <button type="submit" [disabled]="loginForm.invalid">
-      Login
-    </button>
-
-    <!-- Register link -->
-    <p class="redirect">
-      Don’t have an account?
-      <a routerLink="/register">Register</a>
-    </p>
-  </form>
+  </div>
 </div>

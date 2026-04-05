@@ -8,15 +8,15 @@ import { AppComponent } from './app.component';
 import { LoginComponent } from './components/login/login.component';
 import { RegisterComponent } from './components/register/register.component';
 import { PlannerDashboardComponent } from './components/planner-dashboard/planner-dashboard.component';
-
-import { routes } from './app.routes';
-import { AuthInterceptor } from './services/auth.interceptor';
 import { StaffDashboardComponent } from './components/staff-dashboard/staff-dashboard.component';
 import { ClientDashboardComponent } from './components/client-dashboard/client-dashboard.component';
 import { PlannerProfileComponent } from './components/planner-profile/planner-profile.component';
 import { ClientRequestsComponent } from './components/client-requests/client-requests.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { HomeComponent } from './components/home/home.component'; // ✅ ADD THIS BACK
 
+import { routes } from './app.routes';
+import { AuthInterceptor } from './services/auth.interceptor';
 
 @NgModule({
   declarations: [
@@ -29,19 +29,20 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
     PlannerProfileComponent,
     ClientRequestsComponent,
     ForgotPasswordComponent,
+    HomeComponent // ✅ IMPORTANT
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule.forRoot(routes) 
+    RouterModule.forRoot(routes)
   ],
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
-      multi: true   
+      multi: true
     }
   ],
   bootstrap: [AppComponent]

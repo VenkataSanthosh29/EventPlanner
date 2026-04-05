@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ClientService } from '../../services/client.service';
@@ -8,7 +8,8 @@ import { Event } from '../../models/event.model';
 @Component({
   selector: 'app-planner-profile',
   templateUrl: './planner-profile.component.html',
-  styleUrls: ['./planner-profile.component.css']
+  styleUrls: ['./planner-profile.component.css'],
+  encapsulation:ViewEncapsulation.None
 })
 export class PlannerProfileComponent implements OnInit {
 

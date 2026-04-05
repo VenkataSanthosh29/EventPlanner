@@ -10,6 +10,7 @@
 /home/coder/app/server/src/main/java/com/edutech/repositories/EventPlannerRepository.java
 /home/coder/app/server/src/main/java/com/edutech/entities/EventRequest.java
 /home/coder/app/server/src/main/java/com/edutech/entities/Client.java
+/home/coder/app/server/src/main/java/com/edutech/dto/ResetPasswordRequestDto.java
 /home/coder/app/server/src/main/java/com/edutech/repositories/ClientRepository.java
 /home/coder/app/server/src/main/java/com/edutech/controllers/ClientProfileController.java
 /home/coder/app/server/src/main/java/com/edutech/services/UserService.java

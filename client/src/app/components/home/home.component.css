@@ -1,0 +1,435 @@
+/* ============================================================
+   GLOBAL VARIABLES
+   ============================================================ */
+:host {
+  display: block;
+  --ev-purple: #7b3fe4;
+  --ev-pink: #ec4899;
+  --ev-dark: #0b0b15;
+  --ev-gradient: linear-gradient(90deg, #7b3fe4 0%, #ec4899 100%);
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
+  scroll-behavior: smooth;
+  background: var(--ev-dark);
+  color: #fff;
+}
+
+/* ============================================================
+   HERO SECTION
+   ============================================================ */
+#home {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
+  background: black;
+}
+
+#home video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  filter: brightness(0.6);
+}
+
+@keyframes slowZoom {
+  0% { transform: translate(-50%, -50%) scale(1.05); }
+  100% { transform: translate(-50%, -50%) scale(1.2); }
+}
+
+.animate-slow-zoom {
+  animation: slowZoom 20s infinite alternate ease-in-out;
+}
+
+/* HERO TEXT */
+#home h1 {
+  line-height: 1.2;
+  font-weight: 800;
+}
+
+#home .bg-clip-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+nav.ev-nav-glass {
+  backdrop-filter: blur(15px);
+  background: rgba(11, 11, 21, 0.85);
+}
+
+.nav-link-effect {
+  position: relative;
+  transition: color 0.3s;
+}
+
+.nav-link-effect::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--ev-gradient);
+  transition: 0.3s;
+}
+
+.nav-link-effect:hover::after {
+  width: 100%;
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.ev-btn-primary {
+  background: var(--ev-gradient);
+  color: #fff;
+  font-weight: 700;
+  border-radius: 18px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.ev-btn-primary:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(123,63,228,0.5);
+}
+
+/* ============================================================
+   SERVICE CARDS (TOP SERVICES)
+   ============================================================ */
+#services .grid {
+  margin-top: -150px;
+}
+
+.ev-card-rising {
+  position: relative;
+  background: #fff;
+  border-radius: 30px;
+  padding: 40px;
+  overflow: hidden;
+  transition: 0.4s;
+  color: var(--ev-dark);
+}
+
+.ev-card-rising::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0%;
+  background: linear-gradient(to top, var(--ev-purple), var(--ev-pink));
+  transition: height 0.5s ease;
+  z-index: 0;
+}
+
+.ev-card-rising:hover::before {
+  height: 100%;
+}
+
+.ev-card-rising:hover {
+  transform: translateY(-15px);
+}
+/* ============================================================
+   SCROLLING BACKGROUND REVEAL
+   ============================================================ */
+.scroll-bg-container {
+  position: relative;
+  width: 100%;
+  height: 60vh; /* Adjust height as needed */
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 4rem 0;
+}
+
+.scroll-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 120%; /* Taller than container for parallax movement */
+  background-image: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070'); /* Replace with your image */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; /* This creates the "showing while scrolling" effect */
+  z-index: 0;
+}
+
+/* Dark overlay to keep text readable */
+.scroll-bg-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom, 
+    var(--ev-dark) 0%, 
+    rgba(11, 11, 21, 0.6) 50%, 
+    var(--ev-dark) 100%
+  );
+  z-index: 1;
+}
+
+.scroll-bg-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.scroll-bg-content h2 {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  color: #fff;
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.ev-card-rising * {
+  position: relative;
+  z-index: 1;
+}
+
+.ev-card-rising:hover h3,
+.ev-card-rising:hover p,
+.ev-card-rising:hover a {
+  color: white !important;
+}
+/* ============================================================
+   REFINED PARALLAX SECTION
+   ============================================================ */
+.parallax-section {
+  position: relative;
+  height: 60vh; /* Adjust height to your liking */
+  width: 100%;
+  overflow: hidden;
+  
+  /* The Magic Part: */
+  background-image: url('https://t3.ftcdn.net/jpg/06/32/25/48/240_F_632254843_tbDPM5EV6LGbeLNyU9DJso03qeXeX3zK.jpg'); /* High-quality Event Image */
+  background-attachment: fixed; /* Keeps image still while scrolling */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark Overlay to make the "Book Now" text pop */
+.parallax-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--ev-dark) 0%,
+    rgba(11, 11, 21, 0.7) 40%,
+    rgba(11, 11, 21, 0.7) 60%,
+    var(--ev-dark) 100%
+  );
+  z-index: 1;
+}
+
+.parallax-section > div {
+  position: relative;
+  z-index: 10; /* Ensures content sits above the dark overlay */
+}
+/* ============================================================
+   FEATURE SERVICE BOXES
+   ============================================================ */
+.service-box {
+  position: relative;
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  cursor: pointer;
+  overflow: hidden;
+  transition: all 0.4s ease;
+  opacity: 0;
+  transform: translateY(60px);
+}
+
+.service-box.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.service-box::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 20px;
+  background: radial-gradient(circle at var(--x, 50%) var(--y, 50%),
+              rgba(123,63,228,0.2),
+              transparent 60%);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.service-box:hover::before {
+  opacity: 1;
+}
+
+.service-box:hover {
+  transform: translateY(-12px) scale(1.03);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.15);
+}
+
+.service-box .icon {
+  font-size: 32px;
+  margin-bottom: 15px;
+  transition: 0.3s;
+}
+
+.service-box:hover .icon {
+  transform: scale(1.2);
+}
+.testimonial-container-horizontal {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 1rem;
+}
+
+.testimonial-card-horizontal {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+  width: 20rem; /* 80 Tailwind units = 320px approx */
+  background: #fff;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+}
+
+.testimonial-card-horizontal:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(123,63,228,0.2);
+}
+
+.testimonial-card-horizontal img {
+  width: 100%;
+  height: 12rem; /* 48 Tailwind units = 192px approx */
+  object-fit: cover;
+}
+
+.testimonial-card-horizontal .testimonial-info {
+  padding: 1rem;
+  text-align: center;
+}
+/* ============================================================
+   ABOUT SECTION
+   ============================================================ */
+.experience-badge {
+  background: var(--ev-purple);
+  padding: 30px;
+  border-radius: 30px;
+  color: white;
+  animation: float 4s infinite ease-in-out;
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+}
+
+@keyframes float {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+/* ============================================================
+   ENHANCED FOOTER WITH BACKGROUND IMAGE
+   ============================================================ */
+footer#contact {
+  position: relative;
+  /* THE IMAGE URL YOU PROVIDED */
+  background-image: url('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?fm=jpg&q=60&w=3000&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8ZGolMjBwYXJ0eXxlbnwwfHwwfHx8MA%3D%3D');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* THE OVERLAY: This makes the text readable and blends with the page */
+footer#contact::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    #0b0b15 0%,             /* Top matches your page background */
+    rgba(11, 11, 21, 0.8) 50%, /* Middle lets some image peek through */
+    #0b0b15 100%            /* Bottom goes back to solid dark */
+  );
+  z-index: 1;
+}
+
+/* Force content to stay above the image and overlay */
+footer#contact > div {
+  position: relative;
+  z-index: 10;
+}
+
+/* Optional: Add a subtle glow to the top of the footer */
+footer#contact {
+  border-top: 1px solid rgba(123, 63, 228, 0.3);
+}
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+.shadow-glow {
+  box-shadow: 0 10px 40px rgba(236,72,153,0.4);
+}
+
+.ev-gradient-text {
+  background: var(--ev-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.scroll-animate {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.6s ease-out;
+}
+
+.scroll-animate.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  #home h1 {
+    font-size: 4rem;
+  }
+  .service-box {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  #home h1 {
+    font-size: 2.8rem;
+  }
+  .testimonial-card-vertical {
+    max-width: 90%;
+  }
+}
