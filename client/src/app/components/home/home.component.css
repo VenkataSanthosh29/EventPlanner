@@ -433,3 +433,125 @@ footer#contact {
     max-width: 90%;
   }
 }
+
+/* ============================================================
+   HERO ADDITIONS
+   ============================================================ */
+.hero-pill{
+  display:inline-block;
+  padding:8px 14px;
+  border-radius:999px;
+  font-size:11px;
+  letter-spacing:0.22em;
+  font-weight:800;
+  text-transform:uppercase;
+  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  margin-bottom: 16px;
+}
+
+.hero-sub{
+  max-width: 760px;
+  margin: 0 auto 22px auto;
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255,255,255,0.82);
+}
+
+.hero-actions{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top: 18px;
+}
+
+/* Secondary button to match theme */
+.ev-btn-secondary{
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.92);
+  font-weight: 800;
+  border-radius: 18px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+.ev-btn-secondary:hover{
+  transform: translateY(-3px);
+  background: rgba(255,255,255,0.12);
+}
+
+/* Outline CTA */
+.ev-btn-outline{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 18px;
+  border: 1px solid rgba(236,72,153,0.35);
+  color: rgba(255,255,255,0.92);
+  background: rgba(11,11,21,0.35);
+  text-decoration:none;
+  transition: all 0.25s ease;
+}
+.ev-btn-outline:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 18px 45px rgba(236,72,153,0.18);
+}
+
+/* ============================================================
+   ROLES SECTION
+   ============================================================ */
+.roles-section{
+  background: linear-gradient(
+    to bottom,
+    rgba(11,11,21,1) 0%,
+    rgba(11,11,21,0.92) 60%,
+    rgba(11,11,21,1) 100%
+  );
+  border-top: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.role-card{
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 22px;
+  padding: 28px;
+  color: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  text-align: left;
+}
+
+.role-card:hover{
+  transform: translateY(-8px);
+  background: rgba(255,255,255,0.08);
+  box-shadow: 0 20px 60px rgba(123,63,228,0.18);
+}
+
+.role-icon{
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size: 24px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  margin-bottom: 14px;
+}
+
+.role-card h3{
+  font-size: 22px;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.role-card p{
+  color: rgba(255,255,255,0.75);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}

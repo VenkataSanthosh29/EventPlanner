@@ -1,4 +1,4 @@
-<!-- <div class="main-container bg-evDark">
+<div class="main-container bg-evDark">
 
   <!-- NAVBAR -->
   <nav class="fixed top-0 left-0 right-0 z-[100] transition-all duration-500"
@@ -21,9 +21,15 @@
           {{link.name}}
         </a>
 
+        <!-- ✅ New: Login + Create account -->
+        <button routerLink="/login"
+                class="ev-btn-secondary px-6 py-3 text-xs tracking-widest">
+          LOGIN
+        </button>
+
         <button routerLink="/register"
                 class="ev-btn-primary px-8 py-3 text-xs tracking-widest shadow-glow">
-          GET STARTED
+          CREATE ACCOUNT
         </button>
       </div>
 
@@ -33,7 +39,7 @@
   <!-- HERO SECTION -->
   <section id="home" class="relative h-screen flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0">
-      <div class="absolute inset-0 bg-black/50 z-10"></div>
+      <div class="absolute inset-0 bg-black/55 z-10"></div>
 
       <!-- VIDEO -->
       <video #bgVideo autoplay loop muted playsinline
@@ -45,12 +51,81 @@
 
     <!-- HERO TEXT -->
     <div class="relative z-20 text-center px-6 scroll-animate from-bottom">
-      <h1 class="text-white text-6xl md:text-8xl font-extrabold leading-tight mb-8">
-        Celebrate Your <br>
+      <p class="hero-pill">A ROLE-BASED EVENT PLATFORM</p>
+
+      <h1 class="text-white text-6xl md:text-8xl font-extrabold leading-tight mb-6">
+        Celebrate & Deliver<br>
         <span class="bg-gradient-to-r from-evPurple to-evPink bg-clip-text text-transparent italic">
           {{ currentEvent }} Events
         </span>
       </h1>
+
+      <p class="hero-sub">
+        EVENIZER is a shared space for <b>Clients</b>, <b>Event Planners</b>, and <b>Staff</b>.
+        Request events, propose budgets, manage tasks, track progress, and complete payments — all in one workflow.
+      </p>
+
+      <div class="hero-actions">
+        <button routerLink="/register" class="ev-btn-primary px-10 py-4 text-xs shadow-glow uppercase tracking-widest">
+          GET STARTED
+        </button>
+
+        <a href="#roles" class="ev-btn-outline px-10 py-4 text-xs uppercase tracking-widest">
+          CHOOSE ROLE
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ ROLES SECTION (NEW) -->
+  <section id="roles" class="roles-section py-24">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-14 scroll-animate from-bottom">
+        <h2 class="text-4xl md:text-5xl font-black text-white mb-4">
+          One Platform. <span class="ev-gradient-text">Three Roles.</span>
+        </h2>
+        <p class="text-gray-300 max-w-2xl mx-auto">
+          Choose how you want to use Evenizer. You can register as a Client, Planner, or Staff.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-10">
+        <div class="role-card scroll-animate from-left">
+          <div class="role-icon">👤</div>
+          <h3>Client</h3>
+          <p>Request events, approve budgets, give feedback after completion, and pay securely after the event.</p>
+          <button [routerLink]="['/register']" [queryParams]="{ role: 'CLIENT' }"
+        class="ev-btn-primary px-8 py-3 text-xs tracking-widest">
+          Join as Client
+        </button>
+        </div>
+
+        <div class="role-card scroll-animate from-bottom">
+          <div class="role-icon">🗓️</div>
+          <h3>Event Planner</h3>
+          <p>Create events, propose budgets, manage tasks & staff, track ratings and revenue.</p>
+          <button [routerLink]="['/register']" [queryParams]="{ role: 'PLANNER' }"
+          class="ev-btn-primary px-8 py-3 text-xs tracking-widest">
+          Join as Planner
+          </button>
+        </div>
+
+        <div class="role-card scroll-animate from-right">
+          <div class="role-icon">🧑‍🔧</div>
+          <h3>Staff</h3>
+          <p>View assigned tasks, update progress, and support smooth event execution.</p>
+         <button [routerLink]="['/register']" [queryParams]="{ role: 'STAFF' }"
+        class="ev-btn-primary px-8 py-3 text-xs tracking-widest">
+        Join as Staff
+        </button>
+        </div>
+      </div>
+
+      <div class="text-center mt-12">
+        <p class="text-gray-400 text-sm">
+          Already registered? <a routerLink="/login" class="text-evPink font-bold">Login</a>
+        </p>
+      </div>
     </div>
   </section>
 
@@ -66,75 +141,79 @@
             </div>
             <h3 class="text-2xl font-black mb-4 text-evDark">{{ s.title }}</h3>
             <p class="text-gray-500 mb-6">{{ s.description }}</p>
-            <a href="#" class="text-evPink font-bold">Read More →</a>
+            <a href="#roles" class="text-evPink font-bold">Create Account →</a>
           </div>
         </div>
       </div>
     </div>
   </section>
-<section class="scroll-bg-container">
-  <div class="scroll-bg-image"></div>
-  
-  <div class="scroll-bg-overlay"></div>
 
-  <div class="scroll-bg-content scroll-animate">
-    <h2 class="ev-gradient-text">Unforgettable Moments</h2>
-    <p class="text-xl text-gray-300 max-w-2xl mx-auto">
-      Experience the perfect blend of luxury and technology. 
-      We don't just plan events; we create digital-age masterpieces.
-    </p>
-    <!-- <button class="ev-btn-primary px-8 py-3 mt-6">Explore Portfolio</button> -->
-  </div>
-</section>
+  <!-- SCROLLING BACKGROUND REVEAL -->
+  <section class="scroll-bg-container">
+    <div class="scroll-bg-image"></div>
+    <div class="scroll-bg-overlay"></div>
+
+    <div class="scroll-bg-content scroll-animate">
+      <h2 class="ev-gradient-text">Collaboration Made Simple</h2>
+      <p class="text-xl text-gray-300 max-w-2xl mx-auto">
+        Clients request events. Planners coordinate. Staff execute tasks. Everything stays tracked and transparent.
+      </p>
+    </div>
+  </section>
+
   <!-- FEATURED SERVICES -->
   <section class="py-24 bg-gray-50">
     <div class="max-w-7xl mx-auto px-6">
       <div class="text-center mb-16 scroll-animate from-bottom">
-        <h2 class="text-4xl md:text-5xl font-black text-evDark mb-4">Our Event Services</h2>
-        <p class="text-gray-500 max-w-xl mx-auto">We provide everything you need to make your event unforgettable.</p>
+        <h2 class="text-4xl md:text-5xl font-black text-evDark mb-4">Our Platform Features</h2>
+        <p class="text-gray-500 max-w-xl mx-auto">
+          Features designed for role-based workflows — planning, tasking, tracking, and payments.
+        </p>
       </div>
 
       <div class="grid md:grid-cols-3 gap-10">
+
         <div class="service-box scroll-animate from-left">
-          <div class="icon">🎉</div>
-          <h3>Venue Selection</h3>
-          <p>Find the perfect venue for your dream event.</p>
+          <div class="icon">🧾</div>
+          <h3>Event Requests</h3>
+          <p>Clients request events and planners respond with budgets.</p>
           <span>Read More →</span>
         </div>
 
         <div class="service-box scroll-animate from-right">
-          <div class="icon">📸</div>
-          <h3>Photography</h3>
-          <p>Capture every beautiful moment professionally.</p>
+          <div class="icon">✅</div>
+          <h3>Task Assignment</h3>
+          <p>Assign staff to tasks and track progress in one dashboard.</p>
           <span>Read More →</span>
         </div>
 
         <div class="service-box scroll-animate from-left">
-          <div class="icon">📩</div>
-          <h3>Invitations</h3>
-          <p>Creative and elegant invitation designs.</p>
+          <div class="icon">📊</div>
+          <h3>Track & Reports</h3>
+          <p>Planners see events planned, ratings, and revenue.</p>
           <span>Read More →</span>
         </div>
 
         <div class="service-box scroll-animate from-right">
-          <div class="icon">🎸</div>
-          <h3>Entertainment</h3>
-          <p>Music, DJ, and live performances.</p>
+          <div class="icon">💬</div>
+          <h3>Feedback & Rating</h3>
+          <p>Clients give feedback after completion to improve quality.</p>
           <span>Read More →</span>
         </div>
 
         <div class="service-box scroll-animate from-bottom">
-          <div class="icon">🎊</div>
-          <h3>Decoration</h3>
-          <p>Creative themes & stunning visuals.</p>
+          <div class="icon">💳</div>
+          <h3>Payments</h3>
+          <p>Payment is enabled after event completion (demo/test supported).</p>
         </div>
 
         <div class="service-box scroll-animate from-left">
-          <div class="icon">🎭</div>
-          <h3>Performers</h3>
-          <p>Magicians, dancers & entertainers.</p>
+          <div class="icon">🔐</div>
+          <h3>Secure Access</h3>
+          <p>JWT based login + role-based dashboard access control.</p>
           <span>Read More →</span>
         </div>
+
       </div>
     </div>
   </section>
@@ -146,135 +225,113 @@
         <img src="https://images.unsplash.com/photo-1511795409834-ef04bbd61622?q=80&w=2069"
              class="w-full object-cover">
         <div class="experience-badge absolute -bottom-10 -right-10">
-          <div class="text-5xl font-black">15+</div>
-          <div class="text-xs font-bold mt-2">Years Experience</div>
+          <div class="text-5xl font-black">Role</div>
+          <div class="text-xs font-bold mt-2">Based Access</div>
         </div>
       </div>
 
       <div class="scroll-animate from-right">
         <h2 class="text-5xl font-black text-evDark mb-8">
-          We Are The Best <span class="ev-gradient-text">Event Planner</span>
+          A Platform For <span class="ev-gradient-text">Everyone</span>
         </h2>
-        <p class="text-gray-600 mb-10">We handle everything from logistics to lighting.</p>
-      </div>
-    </div>
-  </section>
-<section class="parallax-section px-6">
-  <div class="max-w-3xl scroll-animate from-bottom text-center">
-    <h2 class="text-white text-4xl md:text-6xl font-extrabold mb-6">
-      Your Event Will Be <span class="ev-gradient-text">Special!</span>
-    </h2>
-    <p class="text-gray-300 mb-8 text-lg">
-      From concept to execution, we handle every detail with premium precision.
-    </p>
-    <button routerLink="/register" class="ev-btn-primary px-10 py-4 text-base shadow-glow">
-      Book Now
-    </button>
-  </div>
-</section>
-<!-- TESTIMONIALS -->
-<section class="py-24 bg-gray-50">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="text-center mb-16">
-      <h2 class="text-4xl font-black text-evDark">Testimonials</h2>
-    </div>
-
-    <!-- Horizontal scroll container -->
-    <div class="testimonial-container-horizontal flex gap-6 overflow-x-auto snap-x snap-mandatory">
-      
-      <!-- Testimonial 1 -->
-      <div class="testimonial-card-horizontal flex-shrink-0 w-80 snap-start relative bg-white rounded-2xl shadow-lg overflow-hidden">
-        <img src="https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=600" 
-             alt="John Doe" class="w-full h-48 object-cover">
-        <div class="testimonial-info px-4 py-4 text-center">
-          <h4 class="font-bold text-lg">John Doe</h4>
-          <p class="text-gray-600 text-sm mt-1">"The event was perfect! Very professional team."</p>
-        </div>
-      </div>
-
-      <!-- Testimonial 2 -->
-      <div class="testimonial-card-horizontal flex-shrink-0 w-80 snap-start relative bg-white rounded-2xl shadow-lg overflow-hidden">
-        <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600" 
-             alt="Jane Smith" class="w-full h-48 object-cover">
-        <div class="testimonial-info px-4 py-4 text-center">
-          <h4 class="font-bold text-lg">Jane Smith</h4>
-          <p class="text-gray-600 text-sm mt-1">"Amazing experience from start to finish!"</p>
-        </div>
-      </div>
-
-      <!-- Testimonial 3 -->
-      <div class="testimonial-card-horizontal flex-shrink-0 w-80 snap-start relative bg-white rounded-2xl shadow-lg overflow-hidden">
-        <img src="https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=600" 
-             alt="Alex Johnson" class="w-full h-48 object-cover">
-        <div class="testimonial-info px-4 py-4 text-center">
-          <h4 class="font-bold text-lg">Alex Johnson</h4>
-          <p class="text-gray-600 text-sm mt-1">"They made our event unforgettable!"</p>
-        </div>
-      </div>
-
-      <!-- Testimonial 4 -->
-      <div class="testimonial-card-horizontal flex-shrink-0 w-80 snap-start relative bg-white rounded-2xl shadow-lg overflow-hidden">
-        <img src="https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg?auto=compress&cs=tinysrgb&w=600" 
-             alt="Emily Parker" class="w-full h-48 object-cover">
-        <div class="testimonial-info px-4 py-4 text-center">
-          <h4 class="font-bold text-lg">Emily Parker</h4>
-          <p class="text-gray-600 text-sm mt-1">"Professional, fun, and amazing results!"</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-<footer id="contact" class="pt-24 pb-10 text-white">
-  <div class="max-w-7xl mx-auto px-6">
-    <div class="grid md:grid-cols-4 gap-12">
-      
-      <div>
-        <h2 class="text-4xl font-black mb-6 ev-gradient-text tracking-tighter">EVENIZER</h2>
-        <p class="text-gray-300 leading-relaxed">
-          Creating high-energy, unforgettable experiences from Chennai to the world.
+        <p class="text-gray-600 mb-10">
+          EVENIZER is built as a role-based event management system for Clients, Event Planners and Staff.
+          Each role sees only what they need — keeping the workflow clean and secure.
         </p>
-      </div>
-
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Navigation</h4>
-        <ul class="space-y-3">
-          <li *ngFor="let link of navLinks">
-            <a [href]="link.href" class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center gap-2">
-              <span class="h-px w-3 bg-evPink"></span> {{ link.name }}
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Services</h4>
-        <ul class="text-gray-400 space-y-3">
-          <li class="hover:text-white transition-colors cursor-pointer">Premium Weddings</li>
-          <li class="hover:text-white transition-colors cursor-pointer">Corporate Galas</li>
-          <li class="hover:text-white transition-colors cursor-pointer">Private DJ Parties</li>
-          <li class="hover:text-white transition-colors cursor-pointer">Birthday Bashes</li>
-        </ul>
-      </div>
-
-      <div>
-        <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Get Started</h4>
-        <p class="text-gray-400 mb-2 font-medium">Headquarters</p>
-        <p class="text-gray-500 text-sm">OMR Road, Chennai, India</p>
-        
-        <button routerLink="/register" class="mt-8 ev-btn-primary px-8 py-4 text-xs shadow-glow uppercase tracking-widest">
-          Book Your Event
+        <button routerLink="/register" class="ev-btn-primary px-10 py-4 text-base shadow-glow">
+          Create Your Account
         </button>
       </div>
     </div>
+  </section>
 
-    <div class="border-t border-white/10 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-      <div class="text-gray-500 text-xs">© 2026 EVENIZER PREMIUM EVENTS.</div>
-      <div class="flex gap-6 text-gray-500 text-xs">
-        <a href="#" class="hover:text-white">Privacy Policy</a>
-        <a href="#" class="hover:text-white">Terms of Service</a>
+  <!-- PARALLAX SECTION -->
+  <section class="parallax-section px-6">
+    <div class="max-w-3xl scroll-animate from-bottom text-center">
+      <h2 class="text-white text-4xl md:text-6xl font-extrabold mb-6">
+        Build Your Next <span class="ev-gradient-text">Event Workflow</span>
+      </h2>
+      <p class="text-gray-300 mb-8 text-lg">
+        From request to completion, everything stays organized with tasks, roles, and progress tracking.
+      </p>
+      <button routerLink="/register" class="ev-btn-primary px-10 py-4 text-base shadow-glow">
+        Get Started
+      </button>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="py-24 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-black text-evDark">Testimonials</h2>
+      </div>
+
+      <div class="testimonial-container-horizontal flex gap-6 overflow-x-auto snap-x snap-mandatory">
+        <div class="testimonial-card-horizontal flex-shrink-0 w-80 snap-start relative bg-white rounded-2xl shadow-lg overflow-hidden"
+             *ngFor="let t of mockData.testimonials">
+          <img [src]="t.image" [alt]="t.name" class="w-full h-48 object-cover">
+          <div class="testimonial-info px-4 py-4 text-center">
+            <h4 class="font-bold text-lg">{{ t.name }}</h4>
+            <p class="text-gray-600 text-sm mt-1">"{{ t.feedback }}"</p>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</footer>
-</div> -->
+  </section>
+
+  <!-- FOOTER / CONTACT -->
+  <footer id="contact" class="pt-24 pb-10 text-white">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="grid md:grid-cols-4 gap-12">
+
+        <div>
+          <h2 class="text-4xl font-black mb-6 ev-gradient-text tracking-tighter">EVENIZER</h2>
+          <p class="text-gray-300 leading-relaxed">
+            A role-based event management platform — built for collaboration and visibility.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Navigation</h4>
+          <ul class="space-y-3">
+            <li *ngFor="let link of navLinks">
+              <a [href]="link.href" class="text-gray-400 hover:text-white transition-colors duration-300 flex items-center gap-2">
+                <span class="h-px w-3 bg-evPink"></span> {{ link.name }}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Roles</h4>
+          <ul class="text-gray-400 space-y-3">
+            <li class="hover:text-white transition-colors cursor-pointer">Client</li>
+            <li class="hover:text-white transition-colors cursor-pointer">Event Planner</li>
+            <li class="hover:text-white transition-colors cursor-pointer">Staff</li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-lg font-bold mb-6 text-evPink uppercase tracking-widest text-sm">Get Started</h4>
+          <p class="text-gray-400 mb-2 font-medium">Headquarters</p>
+          <p class="text-gray-500 text-sm">OMR Road, Chennai, India</p>
+
+          <button routerLink="/register" class="mt-8 ev-btn-primary px-8 py-4 text-xs shadow-glow uppercase tracking-widest">
+            Create Account
+          </button>
+        </div>
+
+      </div>
+
+      <div class="border-t border-white/10 mt-20 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="text-gray-500 text-xs">© 2026 EVENIZER PLATFORM.</div>
+        <div class="flex gap-6 text-gray-500 text-xs">
+          <a href="#" class="hover:text-white">Privacy Policy</a>
+          <a href="#" class="hover:text-white">Terms of Service</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+</div>

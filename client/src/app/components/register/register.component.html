@@ -143,8 +143,10 @@
               *ngIf="registrationForm.get('role')?.touched && registrationForm.get('role')?.invalid">
               Role is required
             </small>
+            <small class="hint" *ngIf="registrationForm.get('role')?.value">
+          Role pre-selected. You can change it if needed.
+          </small>
           </div>
-
           <!-- Messages -->
           <p class="success-message" *ngIf="successMessage">{{ successMessage }}</p>
           <p class="error-message"   *ngIf="errorMessage">{{ errorMessage }}</p>

@@ -16,6 +16,7 @@ import {
   of
 } from 'rxjs';
 
+import { ActivatedRoute } from '@angular/router';
 @Component({
   selector: 'app-registration',
   templateUrl: './register.component.html',
@@ -61,10 +62,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
   // ─── Password Visibility ──────────────────────────────────
   showPassword = false;
 
-  constructor(
-    private formBuilder: FormBuilder,
-    private authService: AuthService
-  ) {}
+ constructor(
+  private formBuilder: FormBuilder,
+  private authService: AuthService,
+  private route: ActivatedRoute
+) {}
 
   // ─── Lifecycle ────────────────────────────────────────────
 
@@ -83,7 +85,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: ['', [Validators.required, Validators.minLength(8)]],
       role:     ['', Validators.required]
     });
+    // ✅ Auto-select role if passed from Home page (but user can change it)
+  this.route.queryParamMap.subscribe(params => {
+  const role = params.get('role');
+
+  const allowed = ['CLIENT', 'PLANNER', 'STAFF'];
+
+  if (role && allowed.includes(role)) {
+    this.registrationForm.patchValue({ role }); // user can still change later
+    this.registrationForm.get('role')?.markAsTouched();
   }
+});
+}
 
   ngOnDestroy(): void {
     if (this.resendTimer)   clearInterval(this.resendTimer);
