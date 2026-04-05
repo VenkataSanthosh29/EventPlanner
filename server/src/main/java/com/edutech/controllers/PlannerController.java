@@ -1,18 +1,18 @@
-
 package com.edutech.controllers;
 
 import com.edutech.entities.Event;
 import com.edutech.entities.Task;
+import com.edutech.entities.EventRequest;
 import com.edutech.services.EventService;
 import com.edutech.services.TaskService;
+import com.edutech.services.EventRequestService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import com.edutech.entities.EventRequest;
-import com.edutech.services.EventRequestService;
+import com.edutech.entities.Payment;
+import com.edutech.services.PaymentService;
 import java.util.List;
 
 @RestController
@@ -26,7 +26,12 @@ public class PlannerController {
     private TaskService taskService;
 
     @Autowired
-private EventRequestService requestService;
+    private EventRequestService requestService;
+
+    @Autowired
+    private PaymentService paymentService;
+
+    // -------------------- EVENTS --------------------
 
     @PostMapping("/event")
     public ResponseEntity<Event> createEvent(
@@ -47,19 +52,17 @@ private EventRequestService requestService;
     }
 
     @GetMapping("/events")
-    public ResponseEntity<List<Event>> getEventsByPlanner(
-            @RequestParam Long plannerId) {
-
+    public ResponseEntity<List<Event>> getEventsByPlanner(@RequestParam Long plannerId) {
         return ResponseEntity.ok(eventService.getEventsByPlanner(plannerId));
     }
 
-    // ✅ All tasks (global list)
+    // -------------------- TASKS --------------------
+
     @GetMapping("/tasks")
     public ResponseEntity<List<Task>> getAllTasks() {
         return ResponseEntity.ok(taskService.getAllTasks());
     }
 
-    // ✅ Assign task to staff
     @PostMapping("/tasks/{taskId}/assign/{staffId}")
     public ResponseEntity<Task> assignTaskToStaff(
             @PathVariable Long taskId,
@@ -69,7 +72,6 @@ private EventRequestService requestService;
         return ResponseEntity.ok(task);
     }
 
-    // ✅ Create task for a specific event
     @PostMapping("/events/{eventId}/task")
     public ResponseEntity<Task> createTaskForEvent(
             @PathVariable Long eventId,
@@ -79,27 +81,25 @@ private EventRequestService requestService;
         return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
-    // ✅ OPTIONAL (recommended): get tasks for a particular event
     @GetMapping("/events/{eventId}/tasks")
-    public ResponseEntity<List<Task>> getTasksByEvent(
-            @PathVariable Long eventId) {
-
+    public ResponseEntity<List<Task>> getTasksByEvent(@PathVariable Long eventId) {
         return ResponseEntity.ok(taskService.getTasksByEvent(eventId));
     }
 
+    // -------------------- REQUESTS + BUDGET --------------------
+    // ✅ Planner can view requests
+    @GetMapping("/requests")
+    public ResponseEntity<List<EventRequest>> getRequests(@RequestParam Long plannerId) {
+        return ResponseEntity.ok(requestService.getRequestsForPlanner(plannerId));
+    }
 
-  @GetMapping("/requests")
-public ResponseEntity<List<EventRequest>> getRequests(@RequestParam Long plannerId) {
-    return ResponseEntity.ok(requestService.getRequestsForPlanner(plannerId));
-}
+    // ✅ Planner proposes budget (NEW FLOW)
+    @PostMapping("/requests/{requestId}/propose-budget")
+    public ResponseEntity<EventRequest> proposeBudget(
+            @PathVariable Long requestId,
+            @RequestParam Double budget
+    ) {
+        return ResponseEntity.ok(requestService.proposeBudget(requestId, budget));
+    }
 
-@PostMapping("/requests/{requestId}/accept")
-public ResponseEntity<EventRequest> accept(@PathVariable Long requestId) {
-    return ResponseEntity.ok(requestService.acceptRequest(requestId));
-}
-
-@PostMapping("/requests/{requestId}/reject")
-public ResponseEntity<EventRequest> reject(@PathVariable Long requestId) {
-    return ResponseEntity.ok(requestService.rejectRequest(requestId));
-}
 }

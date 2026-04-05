@@ -1,0 +1,47 @@
+<div class="container">
+  <button class="secondary" (click)="back()">Back</button>
+
+  <h2>Pay Event Amount</h2>
+
+  <div class="hint" *ngIf="demoMode">
+    ⚠ Demo Mode (Static QR). Razorpay UPI QR will work after UPI is enabled / Live keys.
+  </div>
+
+  <div class="hint" *ngIf="loading">Processing…</div>
+  <div class="error-message" *ngIf="error">{{ error }}</div>
+
+  <div class="card" *ngIf="payment">
+    <p><b>Amount:</b> ₹{{ payment.amount }}</p>
+    <p><b>Status:</b> {{ payment.status }}</p>
+
+    <!-- ✅ Static QR for demo -->
+    <div *ngIf="demoMode">
+      <p class="hint">Scan this static QR for demo (no gateway confirmation).</p>
+      <img src="assets/demo-upi-qr.png" class="qr" alt="Demo UPI QR" />
+    </div>
+
+    <!-- ✅ Optional: Razorpay QR (only if enabled) -->
+    <div *ngIf="payment.razorpayQrImageUrl">
+      <p class="hint">Razorpay QR (works only after UPI is enabled)</p>
+      <img [src]="payment.razorpayQrImageUrl" class="qr" alt="Razorpay UPI QR" />
+    </div>
+
+    <div class="actions">
+      <button class="primary" type="button" (click)="markPaidDemo()" [disabled]="loading || payment.status === 'SUCCESS'">
+        Mark as Paid (Demo)
+      </button>
+
+      <button class="secondary" type="button" (click)="tryCreateRazorpayQr()" [disabled]="loading">
+        Try Razorpay QR
+      </button>
+    </div>
+
+    <div class="success-message" *ngIf="payment.status === 'SUCCESS'">
+      ✅ Payment Successful!
+    </div>
+
+    <div class="error-message" *ngIf="payment.status === 'FAILED'">
+      ❌ Payment Failed.
+    </div>
+  </div>
+</div>

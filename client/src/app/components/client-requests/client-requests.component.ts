@@ -27,4 +27,12 @@ export class ClientRequestsComponent implements OnInit {
   back(): void {
     this.router.navigate(['/client-dashboard']);
   }
+
+  acceptBudget(requestId: number) {
+  this.clientService.acceptBudget(requestId, this.clientId).subscribe(() => this.load());
+}
+
+rejectBudget(requestId: number) {
+  this.clientService.rejectBudget(requestId, this.clientId).subscribe(() => this.load());
+}
 }

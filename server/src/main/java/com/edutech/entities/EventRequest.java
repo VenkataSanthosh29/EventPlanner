@@ -17,22 +17,27 @@ public class EventRequest {
     private Long plannerId;
     private String plannerName;
 
-    // ✅ final event type string (Birthday/Wedding/Housewarming etc.)
     private String eventType;
-
-    // ✅ store preferred date as String coming from frontend "yyyy-MM-ddTHH:mm"
-    private String preferredDate;
-
+    private String preferredDate; // "yyyy-MM-ddTHH:mm"
     private String location;
 
     @Column(length = 2000)
     private String description;
 
-    // PENDING / ACCEPTED / REJECTED
-    private String status;
+    // ✅ New lifecycle:
+    // PENDING → BUDGET_PROPOSED → AGREED → (event created) OR REJECTED
+    private String status = "PENDING";
 
-    // set only when accepted
+    // ✅ Budget lifecycle:
+    // PENDING → BUDGET_PROPOSED → CLIENT_ACCEPTED / CLIENT_REJECTED
+    private String budgetStatus = "PENDING";
+
+    // store in rupees (1A)
+    private Double budgetProposed;
+    private Double finalBudget;
+
     private Long createdEventId;
+    private Long paymentId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -42,6 +47,7 @@ public class EventRequest {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) status = "PENDING";
+        if (budgetStatus == null) budgetStatus = "PENDING";
     }
 
     @PreUpdate
@@ -49,7 +55,6 @@ public class EventRequest {
         updatedAt = LocalDateTime.now();
     }
 
-    // getters/setters
     public Long getId() { return id; }
 
     public Long getClientId() { return clientId; }
@@ -79,8 +84,20 @@ public class EventRequest {
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 
+    public String getBudgetStatus() { return budgetStatus; }
+    public void setBudgetStatus(String budgetStatus) { this.budgetStatus = budgetStatus; }
+
+    public Double getBudgetProposed() { return budgetProposed; }
+    public void setBudgetProposed(Double budgetProposed) { this.budgetProposed = budgetProposed; }
+
+    public Double getFinalBudget() { return finalBudget; }
+    public void setFinalBudget(Double finalBudget) { this.finalBudget = finalBudget; }
+
     public Long getCreatedEventId() { return createdEventId; }
     public void setCreatedEventId(Long createdEventId) { this.createdEventId = createdEventId; }
+
+    public Long getPaymentId() { return paymentId; }
+    public void setPaymentId(Long paymentId) { this.paymentId = paymentId; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

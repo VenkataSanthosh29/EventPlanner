@@ -4,9 +4,11 @@ import com.edutech.dto.EventRequestCreateDto;
 import com.edutech.entities.Event;
 import com.edutech.entities.EventPlanner;
 import com.edutech.entities.EventRequest;
+import com.edutech.entities.Payment;
 import com.edutech.repositories.EventPlannerRepository;
 import com.edutech.repositories.EventRepository;
 import com.edutech.repositories.EventRequestRepository;
+import com.edutech.repositories.PaymentRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,10 @@ public class EventRequestService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    // ✅ Client creates request
     public EventRequest createRequest(Long plannerId, EventRequestCreateDto dto) {
 
         EventPlanner planner = plannerRepository.findById(plannerId)
@@ -34,7 +40,7 @@ public class EventRequestService {
 
         EventRequest req = new EventRequest();
         req.setPlannerId(planner.getId());
-        req.setPlannerName(planner.getUsername()); // adjust if your field differs
+        req.setPlannerName(planner.getUsername());
 
         req.setClientId(dto.getClientId());
         req.setClientName(dto.getClientName());
@@ -44,7 +50,10 @@ public class EventRequestService {
         req.setLocation(dto.getLocation());
         req.setDescription(dto.getDescription());
 
+        // New flow defaults
         req.setStatus("PENDING");
+        req.setBudgetStatus("PENDING");
+
         return requestRepository.save(req);
     }
 
@@ -56,64 +65,100 @@ public class EventRequestService {
         return requestRepository.findByClientIdOrderByCreatedAtDesc(clientId);
     }
 
-    public EventRequest acceptRequest(Long requestId) {
+    // ✅ Planner proposes budget
+    public EventRequest proposeBudget(Long requestId, Double budget) {
 
         EventRequest req = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
 
-        if (!"PENDING".equals(req.getStatus())) {
-            throw new IllegalStateException("Request already processed");
+        // Only allow budget proposal on pending/proposed
+        if (!"PENDING".equals(req.getStatus()) && !"BUDGET_PROPOSED".equals(req.getStatus())) {
+            throw new IllegalStateException("Cannot propose budget for processed request");
         }
 
+        if (budget == null || budget <= 0) {
+            throw new IllegalArgumentException("Budget must be greater than 0");
+        }
+
+        req.setBudgetProposed(budget);
+        req.setStatus("BUDGET_PROPOSED");
+        req.setBudgetStatus("BUDGET_PROPOSED");
+
+        return requestRepository.save(req);
+    }
+
+    // ✅ Client accepts budget -> AGREED -> create Event + Payment
+    public EventRequest acceptBudget(Long requestId, Long clientId) {
+
+        EventRequest req = requestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
+        if (!req.getClientId().equals(clientId)) {
+            throw new IllegalStateException("Not your request");
+        }
+
+        if (!"BUDGET_PROPOSED".equals(req.getStatus())) {
+            throw new IllegalStateException("Budget not proposed yet");
+        }
+
+        req.setBudgetStatus("CLIENT_ACCEPTED");
+        req.setFinalBudget(req.getBudgetProposed());
+        req.setStatus("AGREED");
+
+        // ✅ Create Event ONLY after agreement
         EventPlanner planner = plannerRepository.findById(req.getPlannerId())
                 .orElseThrow(() -> new RuntimeException("Planner not found"));
 
         Event event = new Event();
         event.setPlanner(planner);
-
-        // ✅ Copy Event Type from request
         event.setEventType(req.getEventType());
-
-        // ✅ Create a meaningful title
-        event.setTitle("Requested " + req.getEventType() + " Event - " + req.getClientName());
-
+        event.setTitle("Agreed " + req.getEventType() + " Event - " + req.getClientName());
         event.setLocation(req.getLocation() != null ? req.getLocation() : "");
         event.setDescription(req.getDescription() != null ? req.getDescription() : "");
-
-        // ✅ LocalDateTime parsing from "yyyy-MM-ddTHH:mm"
         event.setDate(parseDate(req.getPreferredDate()));
-
-        // status workflow
         event.setStatus("INITIATED");
 
-        Event created = eventRepository.save(event);
+        Event createdEvent = eventRepository.save(event);
+        req.setCreatedEventId(createdEvent.getId());
 
-        req.setStatus("ACCEPTED");
-        req.setCreatedEventId(created.getId());
+        // ✅ Create Payment row (QR will be generated only after event COMPLETED)
+        Payment payment = new Payment();
+        payment.setEventId(createdEvent.getId());
+        payment.setClientId(req.getClientId());
+        payment.setAmount(req.getFinalBudget()); // rupees (1A)
+        payment.setStatus("CREATED");
+
+        Payment createdPayment = paymentRepository.save(payment);
+        req.setPaymentId(createdPayment.getId());
 
         return requestRepository.save(req);
     }
 
-    public EventRequest rejectRequest(Long requestId) {
+    // ✅ Client rejects budget -> REJECTED
+    public EventRequest rejectBudget(Long requestId, Long clientId) {
 
         EventRequest req = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RuntimeException("Request not found"));
 
-        if (!"PENDING".equals(req.getStatus())) {
-            throw new IllegalStateException("Request already processed");
+        if (!req.getClientId().equals(clientId)) {
+            throw new IllegalStateException("Not your request");
         }
 
+        if (!"BUDGET_PROPOSED".equals(req.getStatus())) {
+            throw new IllegalStateException("Budget not proposed yet");
+        }
+
+        req.setBudgetStatus("CLIENT_REJECTED");
         req.setStatus("REJECTED");
+
         return requestRepository.save(req);
     }
 
     private LocalDateTime parseDate(String input) {
         if (input == null || input.isBlank()) return null;
         try {
-            // Angular datetime-local => "2026-04-16T15:00"
-            return LocalDateTime.parse(input);
+            return LocalDateTime.parse(input); // "yyyy-MM-ddTHH:mm"
         } catch (DateTimeParseException ex) {
-            // If parsing fails, keep null so planner can edit later
             return null;
         }
     }

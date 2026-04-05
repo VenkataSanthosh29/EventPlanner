@@ -10,6 +10,10 @@ import { Task } from '../../models/task.model';
 import { User } from '../../models/user.model';
 import { EventRequest } from '../../models/event-request.model';
 
+import { finalize } from 'rxjs/operators';
+
+import { Payment } from '../../models/payment.model';
+
 type PlannerTab = 'events' | 'tasks' | 'requests' | 'profile';
 
 @Component({
@@ -32,6 +36,15 @@ export class PlannerDashboardComponent implements OnInit {
   requests: EventRequest[] = [];
   requestsLoading = false;
 
+  // Budget UI state (per request)
+  budgetInputs: Record<number, number> = {};
+  budgetLoading = false;
+
+  // ✅ Payments (to show Paid / Not Paid in planner dashboard)
+plannerPayments: Payment[] = [];
+paymentByEventId = new Map<number, Payment>();
+paymentsLoading = false;
+
   // Profile
   plannerProfile: any | null = null;
   profileLoading = false;
@@ -40,6 +53,9 @@ export class PlannerDashboardComponent implements OnInit {
   eventForm!: FormGroup;
   taskForm!: FormGroup;
   editingEventId: number | null = null;
+
+  // Prevent double submit
+  creatingEvent = false;
 
   // Event types
   eventTypes: string[] = [
@@ -78,6 +94,7 @@ export class PlannerDashboardComponent implements OnInit {
       this.router.navigate(['/login']);
       return;
     }
+
     this.plannerId = Number(id);
     this.username = localStorage.getItem('username') || 'User';
 
@@ -85,6 +102,7 @@ export class PlannerDashboardComponent implements OnInit {
     this.loadEvents();
     this.loadTasks();
     this.loadStaffs();
+    this.loadPlannerPayments();
 
     // Others -> customEventType required
     this.eventForm.get('eventTypePreset')?.valueChanges.subscribe((val: string) => {
@@ -154,13 +172,25 @@ export class PlannerDashboardComponent implements OnInit {
   }
 
   // ---------- EVENTS ----------
-  loadEvents(): void {
-    this.plannerService.getEventsByPlanner(this.plannerId)
-      .subscribe(data => this.events = data);
-  }
+loadEvents(): void {
+  this.plannerService.getEventsByPlanner(this.plannerId).subscribe({
+    next: (data) => {
+      this.events = data;
+      this.loadPlannerPayments(); // ✅ keep payment statuses up-to-date
+    },
+    error: () => {}
+  });
+}
 
   submitEvent(): void {
-    if (this.eventForm.invalid) return;
+    if (this.creatingEvent) return;
+
+    if (this.eventForm.invalid) {
+      this.eventForm.markAllAsTouched();
+      return;
+    }
+
+    this.creatingEvent = true;
 
     const preset = this.eventForm.value.eventTypePreset;
     const custom = this.eventForm.value.customEventType;
@@ -175,17 +205,19 @@ export class PlannerDashboardComponent implements OnInit {
       eventType: finalType
     };
 
-    if (this.editingEventId) {
-      this.plannerService.updateEvent(this.editingEventId, payload).subscribe(() => {
-        this.resetEventForm();
-        this.loadEvents();
+    const request$ = this.editingEventId
+      ? this.plannerService.updateEvent(this.editingEventId, payload)
+      : this.plannerService.createEvent(this.plannerId, payload);
+
+    request$
+      .pipe(finalize(() => (this.creatingEvent = false)))
+      .subscribe({
+        next: () => {
+          this.resetEventForm();
+          this.loadEvents();
+        },
+        error: () => {}
       });
-    } else {
-      this.plannerService.createEvent(this.plannerId, payload).subscribe(() => {
-        this.resetEventForm();
-        this.loadEvents();
-      });
-    }
   }
 
   editEvent(event: Event): void {
@@ -216,11 +248,13 @@ export class PlannerDashboardComponent implements OnInit {
 
   // ---------- TASKS ----------
   loadTasks(): void {
-    this.plannerService.getAllTasks().subscribe(data => this.tasks = data);
+    this.plannerService.getAllTasks()
+      .subscribe(data => this.tasks = data);
   }
 
   loadStaffs(): void {
-    this.staffService.getAllStaff().subscribe(data => this.staffs = data);
+    this.staffService.getAllStaff()
+      .subscribe(data => this.staffs = data);
   }
 
   hasSelectedTemplateTasks(): boolean {
@@ -270,7 +304,9 @@ export class PlannerDashboardComponent implements OnInit {
       const payload: Partial<Task> = { description: taskName, status: 'INITIATED' };
 
       this.plannerService.createTaskForEvent(eventId, payload).subscribe(created => {
-        this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => this.loadTasks());
+        this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => {
+          this.loadTasks();
+        });
       });
     });
 
@@ -280,27 +316,42 @@ export class PlannerDashboardComponent implements OnInit {
     });
   }
 
-  // ---------- REQUESTS ----------
+  // ---------- REQUESTS (NEW FLOW: propose budget only) ----------
   loadRequests(): void {
     this.requestsLoading = true;
     this.plannerService.getRequests(this.plannerId).subscribe({
       next: (data: EventRequest[]) => {
         this.requests = data;
         this.requestsLoading = false;
+
+        // init budget inputs for pending requests
+        data.forEach(r => {
+          if (r.id && this.budgetInputs[r.id] == null && r.budgetProposed) {
+            this.budgetInputs[r.id] = r.budgetProposed;
+          }
+        });
       },
       error: () => this.requestsLoading = false
     });
   }
 
-  acceptRequest(requestId: number): void {
-    this.plannerService.acceptRequest(requestId).subscribe(() => {
-      this.loadRequests();
-      this.loadEvents();
-    });
-  }
+  proposeBudget(requestId: number): void {
+    if (this.budgetLoading) return;
 
-  rejectRequest(requestId: number): void {
-    this.plannerService.rejectRequest(requestId).subscribe(() => this.loadRequests());
+    const budget = this.budgetInputs[requestId];
+    if (!budget || budget <= 0) return;
+
+    this.budgetLoading = true;
+
+    this.plannerService.proposeBudget(requestId, budget).subscribe({
+      next: () => {
+        this.budgetLoading = false;
+        this.loadRequests();
+      },
+      error: () => {
+        this.budgetLoading = false;
+      }
+    });
   }
 
   // ---------- PROFILE ----------
@@ -327,8 +378,29 @@ export class PlannerDashboardComponent implements OnInit {
 
   formatRequestStatus(status: string): string {
     if (status === 'PENDING') return 'Pending';
-    if (status === 'ACCEPTED') return 'Accepted';
+    if (status === 'BUDGET_PROPOSED') return 'Budget Proposed';
+    if (status === 'AGREED') return 'Agreed';
     if (status === 'REJECTED') return 'Rejected';
     return status;
   }
+
+  loadPlannerPayments(): void {
+  this.paymentsLoading = true;
+
+  this.plannerService.getPlannerPayments(this.plannerId).subscribe({
+    next: (pays: Payment[]) => {
+      this.plannerPayments = pays || [];
+      this.paymentByEventId = new Map<number, Payment>();
+      this.plannerPayments.forEach(p => this.paymentByEventId.set(p.eventId, p));
+      this.paymentsLoading = false;
+    },
+    error: () => {
+      this.paymentsLoading = false;
+    }
+  });
+}
+
+getPaymentForEvent(eventId: number): Payment | undefined {
+  return this.paymentByEventId.get(eventId);
+}
 }

@@ -369,3 +369,24 @@ button:disabled {
 
 .stat-label { color: #6b7280; font-size: 12px; font-weight: 800; }
 .stat-value { font-size: 16px; font-weight: 900; margin-top: 4px; }
+
+/* Prevent double click interactions while creating/updating */
+.form-disabled {
+  pointer-events: none;
+  opacity: 0.75;
+}
+
+/* Budget input */
+.budget-input {
+  width: 140px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 13px;
+}
+
+.budget-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102,126,234,0.18);
+}

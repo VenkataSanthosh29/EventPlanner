@@ -5,10 +5,8 @@ import { environment } from '../../environments/environment';
 
 import { Event } from '../models/event.model';
 import { Task } from '../models/task.model';
-
-
 import { EventRequest } from '../models/event-request.model';
-
+import { Payment } from '../models/payment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -23,8 +21,9 @@ export class PlannerService {
 
   createEvent(plannerId: number, event: Event): Observable<Event> {
     return this.http.post<Event>(
-      `${this.baseUrl}/api/planner/event?plannerId=${plannerId}`,
-      event
+      `${this.baseUrl}/api/planner/event`,
+      event,
+      { params: { plannerId } }
     );
   }
 
@@ -37,13 +36,13 @@ export class PlannerService {
 
   getEventsByPlanner(plannerId: number): Observable<Event[]> {
     return this.http.get<Event[]>(
-      `${this.baseUrl}/api/planner/events?plannerId=${plannerId}`
+      `${this.baseUrl}/api/planner/events`,
+      { params: { plannerId } }
     );
   }
 
   // ---------- TASKS (Event-mapped) ----------
 
-  // ✅ NEW: create task under a specific event
   createTaskForEvent(eventId: number, task: Partial<Task>): Observable<Task> {
     return this.http.post<Task>(
       `${this.baseUrl}/api/planner/events/${eventId}/task`,
@@ -51,7 +50,6 @@ export class PlannerService {
     );
   }
 
-  // ✅ assign staff after task creation
   assignTaskToStaff(taskId: number, staffId: number): Observable<Task> {
     return this.http.post<Task>(
       `${this.baseUrl}/api/planner/tasks/${taskId}/assign/${staffId}`,
@@ -59,21 +57,17 @@ export class PlannerService {
     );
   }
 
-  // ✅ get all tasks (if you still want global list)
   getAllTasks(): Observable<Task[]> {
     return this.http.get<Task[]>(
       `${this.baseUrl}/api/planner/tasks`
     );
   }
 
-  // ✅ OPTIONAL: get tasks for a particular event (recommended after mapping)
   getTasksByEvent(eventId: number): Observable<Task[]> {
     return this.http.get<Task[]>(
       `${this.baseUrl}/api/planner/events/${eventId}/tasks`
     );
   }
-
-  // ---------- OPTIONAL (only if planner can update task status; else unused) ----------
 
   updateTaskStatus(taskId: number, status: string): Observable<Task> {
     return this.http.put<Task>(
@@ -83,31 +77,42 @@ export class PlannerService {
     );
   }
 
-getRequests(plannerId: number) {
-  return this.http.get<EventRequest[]>(
-    `${this.baseUrl}/api/planner/requests`,
-    { params: { plannerId } }
-  );
-}
+  // ---------- REQUESTS (NEW FLOW) ----------
 
-acceptRequest(requestId: number) {
-  return this.http.post<EventRequest>(
-    `${this.baseUrl}/api/planner/requests/${requestId}/accept`,
-    {}
-  );
-}
+  getRequests(plannerId: number): Observable<EventRequest[]> {
+    return this.http.get<EventRequest[]>(
+      `${this.baseUrl}/api/planner/requests`,
+      { params: { plannerId } }
+    );
+  }
 
-rejectRequest(requestId: number) {
-  return this.http.post<EventRequest>(
-    `${this.baseUrl}/api/planner/requests/${requestId}/reject`,
-    {}
-  );
-}
+  // ✅ Planner proposes budget (client accepts/rejects)
+  proposeBudget(requestId: number, budget: number): Observable<EventRequest> {
+    return this.http.post<EventRequest>(
+      `${this.baseUrl}/api/planner/requests/${requestId}/propose-budget`,
+      {},
+      { params: { budget } }
+    );
+  }
 
-getPlannerProfile(plannerId: number) {
-  return this.http.get<any>(
-    `${this.baseUrl}/api/planner/profile`,
-    { params: { plannerId } }
-  );
-}
+  // ❌ OLD FLOW REMOVED:
+  // acceptRequest()
+  // rejectRequest()
+
+  // ---------- PROFILE + PAYMENTS ----------
+
+  getPlannerProfile(plannerId: number): Observable<any> {
+    return this.http.get<any>(
+      `${this.baseUrl}/api/planner/profile`,
+      { params: { plannerId } }
+    );
+  }
+
+  // ✅ Payments for all planner events (to show Paid/Not Paid)
+  getPlannerPayments(plannerId: number): Observable<Payment[]> {
+    return this.http.get<Payment[]>(
+      `${this.baseUrl}/api/planner/payments`,
+      { params: { plannerId } }
+    );
+  }
 }

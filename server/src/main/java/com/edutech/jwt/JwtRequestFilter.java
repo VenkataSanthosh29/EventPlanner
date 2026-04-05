@@ -40,17 +40,18 @@ protected void doFilterInternal(
         FilterChain filterChain
 ) throws ServletException, IOException {
 
-    String path = request.getRequestURI();
-
-    if (path.startsWith("/api/user/forgot-password") ||
-    path.startsWith("/api/user/login") ||
-    path.startsWith("/api/user/register") ||
-    path.startsWith("/api/user/exists")) {
+String path = request.getRequestURI();
+if (path.startsWith("/api/payments/razorpay/webhook") ||
+    path.startsWith("/api/user/forgot-password") ||
+    path.startsWith("/api/user/exists") ||
+    path.equals("/api/user/login") ||
+    path.equals("/api/user/register") ||
+    path.equals("/api/user/send-otp") ||
+    path.equals("/api/user/verify-otp")) {
 
     filterChain.doFilter(request, response);
     return;
-    }
-
+}
 
     final String authHeader = request.getHeader("Authorization");
     String username = null;

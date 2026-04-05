@@ -2,15 +2,24 @@
   <h2>Your Requests</h2>
   <button class="secondary" (click)="back()">Back</button>
 
-  <table>
-    <tr>
-      <th>Planner</th><th>Type</th><th>Status</th><th>Created Event Id</th>
-    </tr>
-    <tr *ngFor="let r of requests">
-      <td>{{ r.plannerName }}</td>
-      <td>{{ r.eventType }}</td>
-      <td>{{ r.status }}</td>
-      <td>{{ r.createdEventId || '—' }}</td>
-    </tr>
-  </table>
+  <tr>
+  <th>Planner</th>
+  <th>Type</th>
+  <th>Status</th>
+  <th>Budget</th>
+  <th>Action</th>
+  <th>Created Event</th>
+</tr>
+
+<tr *ngFor="let r of requests">
+  <td>{{ r.plannerName }}</td>
+  <td>{{ r.eventType }}</td>
+  <td>{{ r.status }}</td>
+  <td>{{ r.budgetProposed ? ('₹' + r.budgetProposed) : '—' }}</td>
+  <td>
+    <button class="primary" (click)="acceptBudget(r.id!)" [disabled]="r.status !== 'BUDGET_PROPOSED'">Accept</button>
+    <button class="secondary" (click)="rejectBudget(r.id!)" [disabled]="r.status !== 'BUDGET_PROPOSED'" style="margin-left:8px;">Reject</button>
+  </td>
+  <td>{{ r.createdEventId || '—' }}</td>
+</tr>
 </div>

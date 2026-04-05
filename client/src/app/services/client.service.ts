@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 
 import { Event } from '../models/event.model';
 import { PlannerProfile } from '../models/planner-profile.model';
+import { Payment } from '../models/payment.model';
 import { EventRequest } from '../models/event-request.model';
 
 @Injectable({ providedIn: 'root' })
@@ -46,6 +47,55 @@ export class ClientService {
   return this.http.get<any>(
     `${this.baseUrl}/api/client/profile`,
     { params: { clientId } }
+  );
+}
+// ✅ Client accepts budget
+acceptBudget(requestId: number, clientId: number) {
+  return this.http.post<EventRequest>(
+    `${this.baseUrl}/api/client/requests/${requestId}/accept-budget`,
+    {},
+    { params: { clientId } }
+  );
+}
+
+// ✅ Client rejects budget
+rejectBudget(requestId: number, clientId: number) {
+  return this.http.post<EventRequest>(
+    `${this.baseUrl}/api/client/requests/${requestId}/reject-budget`,
+    {},
+    { params: { clientId } }
+  );
+}
+
+// ✅ Payments list (to show Pay Now status)
+getMyPayments(clientId: number) {
+  return this.http.get<Payment[]>(
+    `${this.baseUrl}/api/client/payments`,
+    { params: { clientId } }
+  );
+}
+
+// ✅ Create Razorpay QR (Pay Now)
+createRazorpayQr(paymentId: number, clientId: number) {
+  return this.http.post<Payment>(
+    `${this.baseUrl}/api/client/payments/${paymentId}/razorpay/qr`,
+    {},
+    { params: { clientId } }
+  );
+}
+
+// ✅ Poll payment status (backup)
+getPayment(paymentId: number, clientId: number) {
+  return this.http.get<Payment>(
+    `${this.baseUrl}/api/client/payments/${paymentId}`,
+    { params: { clientId } }
+  );
+}
+markPaymentSuccessDemo(paymentId: number, clientId: number) {
+  return this.http.post(
+    `${this.baseUrl}/api/client/payments/${paymentId}/demo-success`,
+    {},
+    { params: { clientId }, responseType: 'text' }
   );
 }
 }

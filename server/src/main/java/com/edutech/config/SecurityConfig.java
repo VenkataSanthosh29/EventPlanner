@@ -24,41 +24,38 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
-
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
-              .antMatchers(
+
+                .antMatchers(
                     "/api/user/register",
                     "/api/user/login",
                     "/api/user/send-otp",
                     "/api/user/verify-otp",
-                    "/api/user/exists/**" ,
-                    "/api/user/forgot-password/**"
+                    "/api/user/exists/**",
+                    "/api/user/forgot-password/**",
+
+                    // ✅ Razorpay webhook must be public
+                    "/api/payments/razorpay/webhook"
                 ).permitAll()
 
-                // Role-based access
                 .antMatchers("/api/planner/**").hasRole("PLANNER")
                 .antMatchers("/api/staff/tasks**").hasRole("STAFF")
                 .antMatchers("/api/client/**").hasRole("CLIENT")
                 .antMatchers("/api/staff/all").hasAnyRole("PLANNER","STAFF")
 
-
                 .anyRequest().authenticated()
             );
 
-        http.addFilterBefore(jwtRequestFilter,
-                UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-    @Bean
-public AuthenticationManager authenticationManager(
-        AuthenticationConfiguration config) throws Exception {
-    return config.getAuthenticationManager();
-}
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
 }

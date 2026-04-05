@@ -11,6 +11,7 @@ import { ClientDashboardComponent } from './components/client-dashboard/client-d
 import { PlannerProfileComponent } from './components/planner-profile/planner-profile.component';
 import { ClientRequestsComponent } from './components/client-requests/client-requests.component';
 import { ForgotPasswordComponent } from './components/forgot-password/forgot-password.component';
+import { PaymentComponent } from './components/payment/payment.component';
 
 export const routes: Routes = [
   // Initial page
@@ -30,6 +31,7 @@ export const routes: Routes = [
   // Extra routes
   { path: 'planner-profile/:plannerId', component: PlannerProfileComponent },
   { path: 'client-requests', component: ClientRequestsComponent },
+  { path: 'payment/:paymentId', component: PaymentComponent },
 
   // Fallback route
   { path: '**', redirectTo: 'home' }

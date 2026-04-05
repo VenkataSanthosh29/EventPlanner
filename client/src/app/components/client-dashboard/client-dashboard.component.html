@@ -66,19 +66,18 @@
               {{ event.planner?.username || '—' }}
             </a>
           </td>
-
           <td>
-            <button
-              class="primary"
-              (click)="editFeedback(event)"
-              [disabled]="!canGiveFeedback(event)"
-            >
+          <button
+            class="primary"
+            (click)="editFeedback(event)"
+            [disabled]="!canGiveFeedback(event)"
+          >
             {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
           </button>
-            <small class="hint" *ngIf="!canGiveFeedback(event)">
-          Only request-created events can be rated
-          </small>
-          </td>
+        <small class="hint" *ngIf="event.status !== 'COMPLETED'">
+          Feedback enabled only after event completion
+        </small>
+        </td>
         </tr>
       </table>
     </section>
@@ -102,6 +101,7 @@
           <th>Rating</th>
           <th>Planned By</th>
           <th>Action</th>
+          <th>Payment</th>
         </tr>
 
         <tr *ngFor="let event of myEvents">
@@ -128,34 +128,74 @@
               {{ (event.feedback || event.rating) ? 'Edit' : 'Add Feedback' }}
             </button>
           </td>
+
+          <td>
+            <ng-container *ngIf="getPaymentForEvent(event.id!) as pay; else noPay">
+             <span *ngIf="pay.status === 'SUCCESS'">✅ Paid</span>
+            <button *ngIf="canPay(event)" class="primary" (click)="openPayment(event)">
+               Pay Now (₹{{ pay.amount }})
+            </button>
+            <span *ngIf="event.status !== 'COMPLETED'">Pay after completion</span>
+            </ng-container>
+            <ng-template #noPay>—</ng-template>
+          </td>
         </tr>
       </table>
     </section>
 
     <!-- ============ YOUR REQUESTS ============ -->
-    <section *ngSwitchCase="'requests'">
-      <h2>Your Requests</h2>
+<section *ngSwitchCase="'requests'">
+  <h2>Your Requests</h2>
 
-      <table class="data-table" *ngIf="myRequests.length > 0; else noReq">
-        <tr>
-          <th>Planner</th>
-          <th>Type</th>
-          <th>Status</th>
-          <th>Created Event</th>
-        </tr>
+  <table class="data-table" *ngIf="myRequests.length > 0; else noReq">
+    <tr>
+      <th>Planner</th>
+      <th>Type</th>
+      <th>Status</th>
+      <th>Budget</th>
+      <th>Action</th>
+      <th>Created Event</th>
+    </tr>
 
-        <tr *ngFor="let r of myRequests">
-          <td>{{ r.plannerName }}</td>
-          <td>{{ r.eventType }}</td>
-          <td>{{ r.status }}</td>
-          <td>{{ r.createdEventId || '—' }}</td>
-        </tr>
-      </table>
+    <tr *ngFor="let r of myRequests">
+      <td>{{ r.plannerName }}</td>
+      <td>{{ r.eventType }}</td>
 
-      <ng-template #noReq>
-        <div class="hint">No requests yet.</div>
-      </ng-template>
-    </section>
+      <td>{{ r.status }}</td>
+
+      <td>
+        {{ r.budgetProposed ? ('₹' + r.budgetProposed) : '—' }}
+      </td>
+
+      <td>
+        <button
+          class="primary"
+          type="button"
+          (click)="acceptBudget(r.id!)"
+          [disabled]="r.status !== 'BUDGET_PROPOSED' || budgetActionLoading"
+        >
+          Accept Budget
+        </button>
+
+        <button
+          class="secondary"
+          type="button"
+          style="margin-left:8px"
+          (click)="rejectBudget(r.id!)"
+          [disabled]="r.status !== 'BUDGET_PROPOSED' || budgetActionLoading"
+        >
+          Reject
+        </button>
+      </td>
+
+      <td>{{ r.createdEventId || '—' }}</td>
+    </tr>
+  </table>
+
+  <ng-template #noReq>
+    <div class="hint">No requests yet.</div>
+  </ng-template>
+</section>
 
     <!-- ============ PROFILE ============ -->
     <section *ngSwitchCase="'profile'">

@@ -17,6 +17,7 @@ import { HomeComponent } from './components/home/home.component'; // ✅ ADD THI
 
 import { routes } from './app.routes';
 import { AuthInterceptor } from './services/auth.interceptor';
+import { PaymentComponent } from './components/payment/payment.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { AuthInterceptor } from './services/auth.interceptor';
     PlannerProfileComponent,
     ClientRequestsComponent,
     ForgotPasswordComponent,
+    PaymentComponent,
     HomeComponent // ✅ IMPORTANT
   ],
   imports: [

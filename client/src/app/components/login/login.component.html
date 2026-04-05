@@ -30,6 +30,12 @@
         [formGroup]="loginForm"
         (ngSubmit)="onSubmit()"
       >
+      <!-- ✅ Top row actions -->
+<div class="ep-top-row">
+  <a routerLink="/home" class="ep-home-btn" aria-label="Go to Home">
+    ⬅ Home
+  </a>
+</div>
         <h2>Sign in to continue</h2>
 
         <div class="ep-form-group">

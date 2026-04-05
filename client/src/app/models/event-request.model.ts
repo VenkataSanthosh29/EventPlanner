@@ -1,7 +1,9 @@
 export interface EventRequest {
   id?: number;
+
   clientId: number;
   clientName: string;
+
   plannerId: number;
   plannerName: string;
 
@@ -10,6 +12,14 @@ export interface EventRequest {
   location?: string;
   description?: string;
 
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  // ✅ New flow:
+  status: 'PENDING' | 'BUDGET_PROPOSED' | 'AGREED' | 'REJECTED';
+
+  // ✅ Budget flow:
+  budgetStatus?: 'PENDING' | 'BUDGET_PROPOSED' | 'CLIENT_ACCEPTED' | 'CLIENT_REJECTED';
+  budgetProposed?: number;  // rupees
+  finalBudget?: number;     // rupees
+
   createdEventId?: number;
+  paymentId?: number;
 }

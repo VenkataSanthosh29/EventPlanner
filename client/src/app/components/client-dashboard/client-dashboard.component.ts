@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { ClientService } from '../../services/client.service';
 import { Event } from '../../models/event.model';
 import { EventRequest } from '../../models/event-request.model';
+import { Payment } from '../../models/payment.model';
 
 type ClientTab = 'all' | 'my' | 'requests' | 'profile';
 
@@ -20,23 +21,22 @@ export class ClientDashboardComponent implements OnInit {
 
   eligibleEventIds = new Set<number>();
 
-  // ✅ unified tab state
   activeTab: ClientTab = 'all';
 
-  // Data
   events: Event[] = [];
   myEvents: Event[] = [];
   myRequests: EventRequest[] = [];
 
-  // Profile
+  // ✅ payments (for Pay Now)
+  payments: Payment[] = [];
+  paymentByEventId = new Map<number, Payment>();
+
   clientProfile: any | null = null;
   profileLoading = false;
 
-  // Feedback/rating editor
   editingEventId: number | null = null;
   feedbackForm!: FormGroup;
 
-  // Emoji rating options (1–5)
   ratingOptions = [
     { value: 1, emoji: '😡', label: 'Very Bad' },
     { value: 2, emoji: '🙁', label: 'Bad' },
@@ -48,8 +48,11 @@ export class ClientDashboardComponent implements OnInit {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
+  // ✅ avoid double clicks
+  budgetActionLoading = false;
+
   constructor(
-    private clientService: ClientService,
+    public clientService: ClientService,
     private fb: FormBuilder,
     private router: Router
   ) {}
@@ -66,25 +69,15 @@ export class ClientDashboardComponent implements OnInit {
     this.loadAllData();
   }
 
-  // ✅ clean tab switch
   setTab(tab: ClientTab): void {
     this.activeTab = tab;
-    this.cancelEdit(); // close editor when switching tabs
+    this.cancelEdit();
 
-    if (tab === 'profile') {
-      this.loadProfile();
-    }
-    if (tab === 'requests') {
-      // requests already loaded in loadAllData; refresh if you want:
-      this.loadRequests();
-    }
-    if (tab === 'my') {
-      // ensure myEvents is up-to-date
-      this.recomputeMyEvents();
-    }
+    if (tab === 'profile') this.loadProfile();
+    if (tab === 'requests') this.loadRequests();
+    if (tab === 'my') this.recomputeMyEvents();
   }
 
-  // ---------- Load ----------
   loadAllData(): void {
     this.clientService.getAllEvents().subscribe(events => {
       this.events = events;
@@ -92,6 +85,7 @@ export class ClientDashboardComponent implements OnInit {
     });
 
     this.loadRequests();
+    this.loadPayments();
   }
 
   loadRequests(): void {
@@ -101,28 +95,32 @@ export class ClientDashboardComponent implements OnInit {
     });
   }
 
-  // My Events = events created from ACCEPTED requests
- private recomputeMyEvents(): void {
-  if (!this.events || this.events.length === 0) {
-    this.myEvents = [];
-    this.eligibleEventIds = new Set<number>();
-    return;
+  loadPayments(): void {
+    this.clientService.getMyPayments(this.clientId).subscribe(pays => {
+      this.payments = pays;
+      this.paymentByEventId = new Map<number, Payment>();
+      pays.forEach(p => this.paymentByEventId.set(p.eventId, p));
+    });
   }
 
-  const acceptedIds = new Set<number>(
-    (this.myRequests || [])
-      .filter(r => r.status === 'ACCEPTED' && !!r.createdEventId)
-      .map(r => Number(r.createdEventId))
-  );
+  private recomputeMyEvents(): void {
+    if (!this.events || this.events.length === 0) {
+      this.myEvents = [];
+      this.eligibleEventIds = new Set<number>();
+      return;
+    }
 
-  // ✅ store for button enable/disable
-  this.eligibleEventIds = acceptedIds;
+    // ✅ AGREED is the new accepted state (old was ACCEPTED)
+    const agreedIds = new Set<number>(
+      (this.myRequests || [])
+        .filter(r => r.status === 'AGREED' && !!r.createdEventId)
+        .map(r => Number(r.createdEventId))
+    );
 
-  // ✅ My Events tab list
-  this.myEvents = this.events.filter(e => !!e.id && acceptedIds.has(Number(e.id)));
-}
+    this.eligibleEventIds = agreedIds;
+    this.myEvents = this.events.filter(e => !!e.id && agreedIds.has(Number(e.id)));
+  }
 
-  // ---------- Profile ----------
   loadProfile(): void {
     if (this.profileLoading) return;
     this.profileLoading = true;
@@ -132,10 +130,56 @@ export class ClientDashboardComponent implements OnInit {
         this.clientProfile = p;
         this.profileLoading = false;
       },
+      error: () => this.profileLoading = false
+    });
+  }
+
+  // ---------- Budget actions ----------
+  acceptBudget(requestId: number): void {
+    if (this.budgetActionLoading) return;
+    this.budgetActionLoading = true;
+
+    this.clientService.acceptBudget(requestId, this.clientId).subscribe({
+      next: () => {
+        this.budgetActionLoading = false;
+        this.loadAllData();
+        this.setTab('my');
+      },
       error: () => {
-        this.profileLoading = false;
+        this.budgetActionLoading = false;
       }
     });
+  }
+
+  rejectBudget(requestId: number): void {
+    if (this.budgetActionLoading) return;
+    this.budgetActionLoading = true;
+
+    this.clientService.rejectBudget(requestId, this.clientId).subscribe({
+      next: () => {
+        this.budgetActionLoading = false;
+        this.loadAllData();
+      },
+      error: () => {
+        this.budgetActionLoading = false;
+      }
+    });
+  }
+
+  // ---------- Payment helpers ----------
+  getPaymentForEvent(eventId: number): Payment | undefined {
+    return this.paymentByEventId.get(eventId);
+  }
+
+  canPay(event: Event): boolean {
+    const pay = this.getPaymentForEvent(event.id!);
+    return event.status === 'COMPLETED' && !!pay && pay.status !== 'SUCCESS';
+  }
+
+  openPayment(event: Event): void {
+    const pay = this.getPaymentForEvent(event.id!);
+    if (!pay) return;
+    this.router.navigate(['/payment', pay.id]);
   }
 
   // ---------- Rating helpers ----------
@@ -149,24 +193,29 @@ export class ClientDashboardComponent implements OnInit {
     return found ? found.emoji : '—';
   }
 
-  // ---------- Feedback editor ----------
-  editFeedback(event: Event): void {
-  // ✅ Do not allow feedback if event not created by this client
-  if (!this.canGiveFeedback(event)) return;
-
-  this.editingEventId = event.id || null;
-
-  this.successMessage = null;
-  this.errorMessage = null;
-
-  this.feedbackForm.patchValue({
-    feedback: event.feedback || '',
-    rating: event.rating ?? null
-  });
-
-  this.feedbackForm.markAsPristine();
-  this.feedbackForm.markAsUntouched();
+canGiveFeedback(event: Event): boolean {
+  return (
+    !!event.id &&
+    this.eligibleEventIds.has(Number(event.id)) &&
+    event.status === 'COMPLETED'
+  );
 }
+
+  editFeedback(event: Event): void {
+    if (!this.canGiveFeedback(event)) return;
+
+    this.editingEventId = event.id || null;
+    this.successMessage = null;
+    this.errorMessage = null;
+
+    this.feedbackForm.patchValue({
+      feedback: event.feedback || '',
+      rating: event.rating ?? null
+    });
+
+    this.feedbackForm.markAsPristine();
+    this.feedbackForm.markAsUntouched();
+  }
 
   submitFeedback(): void {
     if (!this.editingEventId) return;
@@ -185,7 +234,6 @@ export class ClientDashboardComponent implements OnInit {
       next: () => {
         this.successMessage = 'Feedback & rating submitted successfully!';
         this.errorMessage = null;
-
         this.cancelEdit();
         this.loadAllData();
       },
@@ -201,13 +249,8 @@ export class ClientDashboardComponent implements OnInit {
     this.feedbackForm.reset({ feedback: '', rating: null });
   }
 
-  // ---------- Logout ----------
   logout(): void {
     localStorage.clear();
     this.router.navigate(['/login']);
   }
-
-  canGiveFeedback(event: Event): boolean {
-  return !!event.id && this.eligibleEventIds.has(Number(event.id));
-}
 }
