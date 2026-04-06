@@ -32,14 +32,13 @@ public class ClientController {
     @Autowired
     private EventService eventService;
 
-    // -------------------- EVENTS (Client sees ALL events: Option B) --------------------
-
+    //EVENTS (Client sees ALL events) 
     @GetMapping("/events")
     public ResponseEntity<List<Event>> getAllEvents() {
         return ResponseEntity.ok(eventRepository.findAll());
     }
 
-    // -------------------- PLANNER PROFILE --------------------
+    // PLANNER PROFILE 
 
     @GetMapping("/planners/{plannerId}")
     public ResponseEntity<PlannerProfileDto> getPlannerProfile(@PathVariable Long plannerId) {
@@ -58,7 +57,7 @@ public class ClientController {
         return ResponseEntity.ok(eventRepository.findByPlannerId(plannerId));
     }
 
-    // -------------------- REQUESTS --------------------
+    // REQUESTS 
 
     @PostMapping("/planners/{plannerId}/requests")
     public ResponseEntity<EventRequest> createRequest(
@@ -73,7 +72,7 @@ public class ClientController {
         return ResponseEntity.ok(requestService.getRequestsForClient(clientId));
     }
 
-    // ✅ Client accepts budget -> AGREED -> Event + Payment created
+    // Client accepts budget -> AGREED -> Event + Payment created
     @PostMapping("/requests/{requestId}/accept-budget")
     public ResponseEntity<EventRequest> acceptBudget(
             @PathVariable Long requestId,
@@ -82,7 +81,7 @@ public class ClientController {
         return ResponseEntity.ok(requestService.acceptBudget(requestId, clientId));
     }
 
-    // ✅ Client rejects budget -> REJECTED
+    // Client rejects budget -> REJECTED
     @PostMapping("/requests/{requestId}/reject-budget")
     public ResponseEntity<EventRequest> rejectBudget(
             @PathVariable Long requestId,
@@ -91,7 +90,7 @@ public class ClientController {
         return ResponseEntity.ok(requestService.rejectBudget(requestId, clientId));
     }
 
-    // -------------------- FEEDBACK + RATING --------------------
+    // FEEDBACK + RATING 
 
     @PutMapping("/event/{eventId}")
     public ResponseEntity<Event> updateFeedbackAndRating(

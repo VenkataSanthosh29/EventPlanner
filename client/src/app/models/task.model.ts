@@ -7,5 +7,5 @@ export interface Task {
   status: string;
   assignedStaff?: User;
   event?: Event;
-  eventId?: number; // helpful for creation
+  eventId?: number; 
 }

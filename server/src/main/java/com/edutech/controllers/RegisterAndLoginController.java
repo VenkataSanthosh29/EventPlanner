@@ -24,7 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/user")
 public class RegisterAndLoginController {
 
-    // ✅ Purpose constants for OTP (matches your OtpService design)
+    //  Purpose constants for OTP (matches your OtpService design)
     private static final String PURPOSE_REGISTER = "REGISTER";
     private static final String PURPOSE_RESET_PASSWORD = "RESET_PASSWORD";
 
@@ -43,7 +43,7 @@ public class RegisterAndLoginController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    // ✅ Registration
+    //  Registration
     @PostMapping("/register")
     public ResponseEntity<User> registerUser(@RequestBody User user) {
           if (!otpService.isOtpVerified(user.getEmail(), PURPOSE_REGISTER)) {
@@ -52,13 +52,13 @@ public class RegisterAndLoginController {
 
         User registeredUser = userService.registerUser(user);
 
-        // ✅ Cleanup OTP (purpose-based)
+        //  Cleanup OTP (purpose-based)
         otpService.clearOtp(user.getEmail(), PURPOSE_REGISTER);
 
         return new ResponseEntity<>(registeredUser, HttpStatus.CREATED);
     }
 
-    // ✅ Login
+    //  Login
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> loginUser(@RequestBody LoginRequest loginRequest) {
 
@@ -86,23 +86,22 @@ public class RegisterAndLoginController {
         return ResponseEntity.ok(response);
     }
 
-    // ✅ Live username existence check
+    //  Live username existence check
     @GetMapping("/exists/username")
     public ResponseEntity<Boolean> usernameExists(@RequestParam String username) {
         boolean exists = userService.existsByUsername(username);
         return ResponseEntity.ok(exists);
     }
 
-    // ✅ Live email existence check
+    //  Live email existence check
     @GetMapping("/exists/email")
     public ResponseEntity<Boolean> emailExists(@RequestParam String email) {
         boolean exists = userService.existsByEmail(email);
         return ResponseEntity.ok(exists);
     }
 
-    // =========================================================
-    // ✅ OTP FOR REGISTRATION (purpose = REGISTER)
-    // =========================================================
+    
+    //  OTP FOR REGISTRATION (purpose = REGISTER)
 
     @PostMapping("/send-otp")
     public ResponseEntity<String> sendOtp(@RequestBody OtpRequest request) {
@@ -116,7 +115,7 @@ public class RegisterAndLoginController {
         try {
             String otp = otpService.generateOrResendOtp(request.getEmail(), PURPOSE_REGISTER);
 
-            // ✅ Purpose-based email template
+            //  Purpose-based email template
             emailService.sendOtpEmail(request.getEmail(), otp, PURPOSE_REGISTER);
 
             return ResponseEntity.ok("OTP sent successfully");
@@ -145,17 +144,16 @@ public class RegisterAndLoginController {
         return ResponseEntity.ok("OTP verified");
     }
 
-    // =========================================================
-    // ✅ FORGOT PASSWORD FLOW (purpose = RESET_PASSWORD)
-    // =========================================================
+ 
+    //  FORGOT PASSWORD FLOW (purpose = RESET_PASSWORD)
 
-    // ✅ 1) Send OTP for password reset
+    //  1) Send OTP for password reset
     @PostMapping("/forgot-password/send-otp")
     public ResponseEntity<String> sendResetOtp(@RequestBody OtpRequest request) {
 
         String email = request.getEmail();
 
-        // ✅ Only valid email -> send OTP
+        //  Only valid email -> send OTP
         if (!userService.existsByEmail(email)) {
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -165,7 +163,7 @@ public class RegisterAndLoginController {
         try {
             String otp = otpService.generateOrResendOtp(email, PURPOSE_RESET_PASSWORD);
 
-            // ✅ Purpose-based email template
+            //  Purpose-based email template
             emailService.sendOtpEmail(email, otp, PURPOSE_RESET_PASSWORD);
 
             return ResponseEntity.ok("OTP sent");
@@ -176,7 +174,7 @@ public class RegisterAndLoginController {
         }
     }
 
-    // ✅ 2) Verify OTP for password reset
+    //  2) Verify OTP for password reset
     @PostMapping("/forgot-password/verify-otp")
     public ResponseEntity<String> verifyResetOtp(@RequestBody OtpVerifyRequest request) {
 
@@ -195,7 +193,7 @@ public class RegisterAndLoginController {
         return ResponseEntity.ok("OTP verified");
     }
 
-    // ✅ 3) Reset password (only after OTP verified)
+    //  3) Reset password (only after OTP verified)
     @PostMapping("/forgot-password/reset")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto dto) {
 
@@ -209,7 +207,7 @@ public class RegisterAndLoginController {
 
         userService.updatePasswordByEmail(email, dto.getNewPassword());
 
-        // ✅ cleanup OTP after success
+        //  cleanup OTP after success
         otpService.clearOtp(email, PURPOSE_RESET_PASSWORD);
 
         return ResponseEntity.ok("Password updated successfully");

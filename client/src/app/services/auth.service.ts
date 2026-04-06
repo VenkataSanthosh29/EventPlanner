@@ -12,9 +12,7 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  // =========================
-  // 🔐 LOGIN
-  // =========================
+  
   login(credentials: { username: string; password: string }): Observable<any> {
     return this.http.post<any>(
       `${this.baseUrl}/api/user/login`,
@@ -22,25 +20,23 @@ export class AuthService {
     ).pipe(
       tap(response => {
 
-        // ✅ Save token
+        // Save token
         localStorage.setItem('token', response.token);
 
-        // ✅ Handle role safely (string / array)
+        //  Handle role safely (string / array)
         const role = Array.isArray(response.roles)
           ? response.roles[0]
           : response.roles;
 
         localStorage.setItem('role', role);
 
-        // ✅ Save user id
+        //  Save user id
         localStorage.setItem('user_id', String(response.userId));
       })
     );
   }
 
-  // =========================
-  // 👤 REGISTER
-  // =========================
+
   createUser(userData: any): Observable<any> {
     return this.http.post(
       `${this.baseUrl}/api/user/register`,
@@ -48,9 +44,7 @@ export class AuthService {
     );
   }
 
-  // =========================
-  // 📦 STORAGE HELPERS
-  // =========================
+
   getToken(): string | null {
     return localStorage.getItem('token');
   }
@@ -71,9 +65,8 @@ export class AuthService {
     localStorage.clear();
   }
 
-  // =========================
-  // ✅ VALIDATION APIs
-  // =========================
+
+  //  VALIDATION APIs
   checkUsernameExists(username: string): Observable<boolean> {
     return this.http.get<boolean>(
       `${this.baseUrl}/api/user/exists/username`,
@@ -88,9 +81,9 @@ export class AuthService {
     );
   }
 
-  // =========================
-  // 🔐 OTP (REGISTER FLOW)
-  // =========================
+
+  //  OTP (REGISTER FLOW)
+
   sendOtp(email: string): Observable<string> {
     return this.http.post(
       `${this.baseUrl}/api/user/send-otp`,
@@ -107,9 +100,8 @@ export class AuthService {
     );
   }
 
-  // =========================
-  // 🔁 FORGOT PASSWORD FLOW
-  // =========================
+ 
+  //  FORGOT PASSWORD FLOW
   forgotPasswordSendOtp(email: string): Observable<string> {
     return this.http.post(
       `${this.baseUrl}/api/user/forgot-password/send-otp`,

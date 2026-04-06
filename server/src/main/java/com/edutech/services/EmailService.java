@@ -26,9 +26,9 @@ public class EmailService {
         return sender;
     }
 
-    /**
-     * Purpose values expected: "REGISTER" or "RESET_PASSWORD"
-     */
+
+     //Purpose values expected: "REGISTER" or "RESET_PASSWORD"
+
     public void sendOtpEmail(String toEmail, String otp, String purpose) {
         try {
             JavaMailSender mailSender = getMailSender();
@@ -50,8 +50,6 @@ public class EmailService {
             throw new RuntimeException("Failed to send OTP email", e);
         }
     }
-
-    // ✅ Backward compatible method (if any old code still calls 2 params)
     public void sendOtpEmail(String toEmail, String otp) {
         sendOtpEmail(toEmail, otp, "REGISTER");
     }

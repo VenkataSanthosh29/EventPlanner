@@ -39,9 +39,7 @@ export class LoginComponent implements OnInit {
     });
   }
 
-  // =========================
-  // 🌟 CURSOR ORB EFFECT
-  // =========================
+
   @HostListener('document:mousemove', ['$event'])
   onMouseMove(e: MouseEvent) {
     const orb = this.el.nativeElement.querySelector('.ep-login-orb') as HTMLElement;
@@ -60,9 +58,7 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  // =========================
-  // 👁️ EYE ANIMATION (SHATTER)
-  // =========================
+
   onRevealClick(): void {
     this.isPasswordRevealing = true;
 
@@ -81,16 +77,12 @@ export class LoginComponent implements OnInit {
     this.isPasswordRevealing = false;
   }
 
-  // =========================
-  // 🌙 THEME TOGGLE
-  // =========================
+
   toggleTheme(): void {
     this.currentTheme = this.currentTheme === 'night' ? 'day' : 'night';
   }
 
-  // =========================
-  // 🔐 LOGIN LOGIC (UPDATED)
-  // =========================
+
   onSubmit(): void {
 
     if (this.loginForm.invalid) {
@@ -105,10 +97,10 @@ export class LoginComponent implements OnInit {
       tap((response: any) => {
         if (!response) return;
 
-        // ✅ Store username
+        //  Store username
         localStorage.setItem('username', this.loginForm.value.username);
 
-        // ✅ Handle multiple role formats safely
+        //  Handle multiple role formats safely
         const roleRaw =
           response?.roles ??
           response?.role ??
@@ -118,7 +110,7 @@ export class LoginComponent implements OnInit {
 
         const role = Array.isArray(roleRaw) ? roleRaw[0] : roleRaw;
 
-        // ✅ Navigate based on role
+        //  Navigate based on role
         if (role === 'PLANNER') {
           this.router.navigate(['/planner-dashboard']);
         } 

@@ -31,7 +31,7 @@ public class PlannerController {
     @Autowired
     private PaymentService paymentService;
 
-    // -------------------- EVENTS --------------------
+    //  EVENTS 
 
     @PostMapping("/event")
     public ResponseEntity<Event> createEvent(
@@ -56,7 +56,7 @@ public class PlannerController {
         return ResponseEntity.ok(eventService.getEventsByPlanner(plannerId));
     }
 
-    // -------------------- TASKS --------------------
+    // TASKS 
 
     @GetMapping("/tasks")
     public ResponseEntity<List<Task>> getAllTasks() {
@@ -86,14 +86,14 @@ public class PlannerController {
         return ResponseEntity.ok(taskService.getTasksByEvent(eventId));
     }
 
-    // -------------------- REQUESTS + BUDGET --------------------
-    // ✅ Planner can view requests
+    // REQUESTS + BUDGET
+    // Planner can view requests
     @GetMapping("/requests")
     public ResponseEntity<List<EventRequest>> getRequests(@RequestParam Long plannerId) {
         return ResponseEntity.ok(requestService.getRequestsForPlanner(plannerId));
     }
 
-    // ✅ Planner proposes budget (NEW FLOW)
+    // Planner proposes budget 
     @PostMapping("/requests/{requestId}/propose-budget")
     public ResponseEntity<EventRequest> proposeBudget(
             @PathVariable Long requestId,

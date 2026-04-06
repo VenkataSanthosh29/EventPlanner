@@ -86,7 +86,7 @@ export class PlannerService {
     );
   }
 
-  // ✅ Planner proposes budget (client accepts/rejects)
+  // Planner proposes budget (client accepts/rejects)
   proposeBudget(requestId: number, budget: number): Observable<EventRequest> {
     return this.http.post<EventRequest>(
       `${this.baseUrl}/api/planner/requests/${requestId}/propose-budget`,
@@ -94,10 +94,6 @@ export class PlannerService {
       { params: { budget } }
     );
   }
-
-  // ❌ OLD FLOW REMOVED:
-  // acceptRequest()
-  // rejectRequest()
 
   // ---------- PROFILE + PAYMENTS ----------
 
@@ -108,7 +104,7 @@ export class PlannerService {
     );
   }
 
-  // ✅ Payments for all planner events (to show Paid/Not Paid)
+  //  Payments for all planner events (to show Paid/Not Paid)
   getPlannerPayments(plannerId: number): Observable<Payment[]> {
     return this.http.get<Payment[]>(
       `${this.baseUrl}/api/planner/payments`,

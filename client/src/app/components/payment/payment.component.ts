@@ -17,7 +17,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
   loading = false;
   error: string | null = null;
 
-  // ✅ DEMO MODE (static QR + mark paid)
+  //  DEMO MODE (static QR + mark paid)
   demoMode = true;
 
   private timer: any;
@@ -32,10 +32,10 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.clientId = Number(localStorage.getItem('user_id'));
     this.paymentId = Number(this.route.snapshot.paramMap.get('paymentId'));
 
-    // ✅ Always fetch payment details first
+    // Always fetch payment details first
     this.loadPayment();
 
-    // ❌ DO NOT auto-create Razorpay QR (it fails due to UPI not enabled)
+    // DO NOT auto-create Razorpay QR (it fails due to UPI not enabled)
     // If you want, user can click a button to try Razorpay QR manually.
   }
 
@@ -47,7 +47,6 @@ export class PaymentComponent implements OnInit, OnDestroy {
     this.clientService.getPayment(this.paymentId, this.clientId).subscribe({
       next: (p) => {
         this.payment = p;
-        // Start polling only if not already success
         if (p.status !== 'SUCCESS') {
           this.startPolling();
         }
@@ -61,7 +60,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ Optional: Try Razorpay QR manually (will work only after UPI is enabled)
+  //  Optional: Try Razorpay QR manually (will work only after UPI is enabled)
   tryCreateRazorpayQr(): void {
     this.loading = true;
     this.error = null;
@@ -79,7 +78,7 @@ export class PaymentComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ✅ DEMO: mark payment success without Razorpay
+  //  DEMO: mark payment success without Razorpay
   markPaidDemo(): void {
     if (!this.payment) return;
 

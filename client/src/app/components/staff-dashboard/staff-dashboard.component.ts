@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { StaffService } from '../../services/staff.service';
 import { Task } from '../../models/task.model';
 
-type StaffTab = 'tasks'; // ✅ Only one tab now (extend later if you want)
+type StaffTab = 'tasks'; 
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -47,7 +47,7 @@ export class StaffDashboardComponent implements OnInit {
   loadTasks(): void {
     this.loading = true;
 
-    // ✅ Replace with your actual API method name
+  
     this.staffService.getAssignedTasks(this.staffId).subscribe({
       next: (data: Task[]) => {
         this.tasks = data || [];
@@ -59,7 +59,6 @@ export class StaffDashboardComponent implements OnInit {
     });
   }
 
-  // ✅ Optional: status updates (if you already support it)
   updateStatus(task: Task, status: string): void {
     if (!task?.id) return;
 

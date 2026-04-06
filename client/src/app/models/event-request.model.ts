@@ -12,10 +12,10 @@ export interface EventRequest {
   location?: string;
   description?: string;
 
-  // ✅ New flow:
+
   status: 'PENDING' | 'BUDGET_PROPOSED' | 'AGREED' | 'REJECTED';
 
-  // ✅ Budget flow:
+  // Budget flow:
   budgetStatus?: 'PENDING' | 'BUDGET_PROPOSED' | 'CLIENT_ACCEPTED' | 'CLIENT_REJECTED';
   budgetProposed?: number;  // rupees
   finalBudget?: number;     // rupees

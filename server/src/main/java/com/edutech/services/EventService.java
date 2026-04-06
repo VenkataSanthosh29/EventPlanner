@@ -24,24 +24,24 @@ public class EventService {
     @Autowired
     private TaskRepository taskRepository;
 
-    // ✅ CREATE EVENT — FORCE INITIATED
+    //  CREATE EVENT — FORCE INITIATED
     public Event createEvent(Long plannerId, Event event) {
 
         EventPlanner planner = eventPlannerRepository.findById(plannerId)
                 .orElseThrow(() -> new RuntimeException("Planner not Found"));
 
         event.setPlanner(planner);
-        event.setStatus("INITIATED"); // ✅ initial status
+        event.setStatus("INITIATED"); // initial status
         event.setEventType(event.getEventType());  // already coming from request
         return eventRepository.save(event);
     }
 
-    // ✅ GET ALL EVENTS
+    //  GET ALL EVENTS
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }
 
-    // ✅ UPDATE EVENT — metadata always allowed, status validated only when changed
+    // UPDATE EVENT
     public Event updateEvent(Long eventId, Event eventDetails) {
 
         Event event = eventRepository.findById(eventId)
@@ -49,17 +49,15 @@ public class EventService {
 
         String oldStatus = event.getStatus();
         String newStatus = eventDetails.getStatus();
-
-        // ✅ Always allow metadata updates (real-world requirement)
         event.setTitle(eventDetails.getTitle());
         event.setDate(eventDetails.getDate());
         event.setLocation(eventDetails.getLocation());
         event.setDescription(eventDetails.getDescription());
         event.setEventType(eventDetails.getEventType());
-        // ✅ Update status ONLY if it is provided and actually different
+        // Update status ONLY if it is provided and actually different
         if (newStatus != null && !newStatus.isBlank() && !newStatus.equals(oldStatus)) {
 
-            // ✅ Validate forward-only transitions
+            //  Validate forward-only transitions
             if (!isValidEventStatusTransition(oldStatus, newStatus)) {
                 throw new IllegalStateException(
                         "Invalid event status transition: " + oldStatus + " -> " + newStatus
@@ -71,7 +69,7 @@ public class EventService {
 
         Event saved = eventRepository.save(event);
 
-        // ✅ If event became COMPLETED, complete all remaining tasks for that event
+        // If event became COMPLETED, complete all remaining tasks for that event
         if (!"COMPLETED".equals(oldStatus) && "COMPLETED".equals(saved.getStatus())) {
             List<Task> pendingTasks = taskRepository.findByEventIdAndStatusNot(saved.getId(), "COMPLETED");
             for (Task t : pendingTasks) {
@@ -83,12 +81,12 @@ public class EventService {
         return saved;
     }
 
-    // ✅ GET EVENTS BY PLANNER
+    //  GET EVENTS BY PLANNER
     public List<Event> getEventsByPlanner(Long plannerId) {
         return eventRepository.findByPlannerId(plannerId);
     }
 
-    // ✅ CLIENT FEEDBACK (NO STATUS CHANGE)
+    //  CLIENT FEEDBACK 
     public Event updateFeedback(Long eventId, String feedback) {
 
         Event event = eventRepository.findById(eventId)
@@ -117,7 +115,7 @@ public class EventService {
     return eventRepository.save(event);
 }
 
-    // ✅ STATUS TRANSITION RULES (forward-only)
+    //  STATUS TRANSITION RULES 
     private boolean isValidEventStatusTransition(String current, String next) {
         if (current == null || next == null) return false;
 

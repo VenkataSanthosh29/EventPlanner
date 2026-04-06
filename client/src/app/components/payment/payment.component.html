@@ -4,7 +4,7 @@
   <h2>Pay Event Amount</h2>
 
   <div class="hint" *ngIf="demoMode">
-    ⚠ Demo Mode (Static QR). Razorpay UPI QR will work after UPI is enabled / Live keys.
+     Demo Mode (Static QR). Razorpay UPI QR will work after UPI is enabled / Live keys.
   </div>
 
   <div class="hint" *ngIf="loading">Processing…</div>
@@ -14,13 +14,13 @@
     <p><b>Amount:</b> ₹{{ payment.amount }}</p>
     <p><b>Status:</b> {{ payment.status }}</p>
 
-    <!-- ✅ Static QR for demo -->
+
     <div *ngIf="demoMode">
       <p class="hint">Scan this static QR for demo (no gateway confirmation).</p>
       <img src="assets/demo-upi-qr.png" class="qr" alt="Demo UPI QR" />
     </div>
 
-    <!-- ✅ Optional: Razorpay QR (only if enabled) -->
+    <!-- Optional: Razorpay QR (only if enabled) -->
     <div *ngIf="payment.razorpayQrImageUrl">
       <p class="hint">Razorpay QR (works only after UPI is enabled)</p>
       <img [src]="payment.razorpayQrImageUrl" class="qr" alt="Razorpay UPI QR" />

@@ -15,14 +15,14 @@ export class StaffService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Get tasks assigned to a staff member
+  // Get tasks assigned to a staff member
   getAssignedTasks(staffId: number): Observable<Task[]> {
     return this.http.get<Task[]>(
       `${this.baseUrl}/api/staff/tasks/${staffId}`
     );
   }
 
-  // ✅ Update task status
+  // Update task status
   updateTaskStatus(taskId: number, status: string): Observable<Task> {
     const params = new HttpParams().set('status', status);
 
@@ -33,7 +33,7 @@ export class StaffService {
     );
   }
 
-  // ✅ Get all staff (used by planner dashboard)
+  // Get all staff (used by planner dashboard)
   getAllStaff(): Observable<User[]> {
     return this.http.get<User[]>(
       `${this.baseUrl}/api/staff/all`

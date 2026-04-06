@@ -25,21 +25,21 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class RegisterComponent implements OnInit, OnDestroy {
 
-  // ─── Template Refs ────────────────────────────────────────
+  //Template Refs 
   @ViewChild('authOrb')  authOrbRef!: ElementRef<HTMLDivElement>;
   @ViewChild('otpInput') otpInputRef!: ElementRef<HTMLInputElement>;
 
-  // ─── Theme ────────────────────────────────────────────────
+  //Theme 
   currentTheme: 'night' | 'day' = 'night';
 
-  // ─── Form ─────────────────────────────────────────────────
+  // Form 
   registrationForm!: FormGroup;
 
-  // ─── Feedback (main form) ─────────────────────────────────
+  //Feedback (main form)
   successMessage: string | null = null;
   errorMessage:   string | null = null;
 
-  // ─── OTP State ────────────────────────────────────────────
+  //OTP State
   otpSent     = false;
   otpVerified = false;
   otpValue    = '';
@@ -54,12 +54,12 @@ export class RegisterComponent implements OnInit, OnDestroy {
   /** Green flash shown in the main form for 3 s after verify */
   otpSuccessFlash: string | null = null;
 
-  // ─── Cooldown ─────────────────────────────────────────────
+  // Cooldown 
   resendCooldown = 0;
   private resendTimer:   any;
   private otpFlashTimer: any;
 
-  // ─── Password Visibility ──────────────────────────────────
+  //assword Visibility
   showPassword = false;
 
  constructor(
@@ -68,8 +68,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private route: ActivatedRoute
 ) {}
 
-  // ─── Lifecycle ────────────────────────────────────────────
-
+  //Lifecycle 
   ngOnInit(): void {
     this.registrationForm = this.formBuilder.group({
       username: ['', {
@@ -85,7 +84,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       password: ['', [Validators.required, Validators.minLength(8)]],
       role:     ['', Validators.required]
     });
-    // ✅ Auto-select role if passed from Home page (but user can change it)
+    // Auto-select role if passed from Home page (but user can change it)
   this.route.queryParamMap.subscribe(params => {
   const role = params.get('role');
 
@@ -103,19 +102,18 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (this.otpFlashTimer) clearTimeout(this.otpFlashTimer);
   }
 
-  // ─── Theme ────────────────────────────────────────────────
-
+  //Theme
   toggleTheme(): void {
     this.currentTheme = this.currentTheme === 'night' ? 'day' : 'night';
   }
 
-  // ─── Password ─────────────────────────────────────────────
+  // Password 
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  // ─── Cursor Orb ───────────────────────────────────────────
+  //Cursor Orb 
 
   onMouseMove(event: MouseEvent): void {
     const orb = this.authOrbRef?.nativeElement;
@@ -125,7 +123,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     orb.style.top     = event.clientY + 'px';
   }
 
-  // ─── Overlay click (close on backdrop) ───────────────────
+  //Overlay click (close on backdrop)
 
   onOverlayClick(event: MouseEvent): void {
     // close only if clicking the dark backdrop, not the card itself
@@ -139,7 +137,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.otpError   = null;
   }
 
-  // ─── OTP: Send ────────────────────────────────────────────
+  // OTP: Send 
 
   sendOtp(): void {
     const emailControl = this.registrationForm.get('email');
@@ -176,7 +174,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ─── OTP: Input sanitise ──────────────────────────────────
+  // OTP: Input sanitise
 
   getCleanOtp(): string {
     return this.otpValue.replace(/\D/g, '');
@@ -186,7 +184,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.otpValue = this.otpValue.replace(/\D/g, '');
   }
 
-  // ─── OTP: Verify ─────────────────────────────────────────
+  //OTP: Verify 
 
   verifyOtp(): void {
     const email = this.registrationForm.get('email')?.value;
@@ -220,8 +218,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Resend Cooldown ──────────────────────────────────────
-
+  //Resend Cooldown 
   startResendCooldown(): void {
     this.resendCooldown = 30;
     clearInterval(this.resendTimer);
@@ -230,7 +227,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     }, 1000);
   }
 
-  // ─── Registration Submit ──────────────────────────────────
+  // Registration Submit 
 
   onSubmit(): void {
     if (!this.otpVerified) {
@@ -263,8 +260,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ─── Async Validators ─────────────────────────────────────
-
+  //  Async Validators
   usernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
       if (!control.value) return of(null);

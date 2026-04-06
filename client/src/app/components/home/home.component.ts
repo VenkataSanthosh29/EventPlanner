@@ -20,7 +20,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
   isScrolled = false;
   private intervalId: any;
 
-  // ✅ Updated nav links to include Roles
+  //  Updated nav links to include Roles
   navLinks = [
     { name: 'Home', href: '#home' },
     { name: 'Roles', href: '#roles' },
@@ -30,7 +30,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     { name: 'Contact', href: '#contact' }
   ];
 
-  // ✅ More “platform” tone
+  //  More “platform” tone
   eventTypes = ['Wedding', 'Birthday', 'Corporate', 'Concert', 'Conference', 'Reception'];
   currentEventIndex = 0;
 
@@ -38,7 +38,7 @@ export class HomeComponent implements OnInit, AfterViewInit, OnDestroy {
     return this.eventTypes[this.currentEventIndex];
   }
 
-  // ✅ Your existing mock data (unchanged)
+  // Your existing mock data (unchanged)
   mockData = {
     quickServices: [
       {

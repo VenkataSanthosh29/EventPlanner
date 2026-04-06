@@ -16,7 +16,7 @@ public class Task {
     @ManyToOne
     private Staff assignedStaff;
 
-    // ✅ NEW: Map task to an event
+    // Map task to an event
     @ManyToOne
     @JoinColumn(name = "event_id")
     private Event event;
@@ -32,8 +32,6 @@ public class Task {
 
     public Staff getAssignedStaff() { return assignedStaff; }
     public void setAssignedStaff(Staff assignedStaff) { this.assignedStaff = assignedStaff; }
-
-    // ✅ getters/setters for event
     public Event getEvent() { return event; }
     public void setEvent(Event event) { this.event = event; }
 }

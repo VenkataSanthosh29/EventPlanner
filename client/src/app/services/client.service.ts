@@ -49,7 +49,7 @@ export class ClientService {
     { params: { clientId } }
   );
 }
-// ✅ Client accepts budget
+//  Client accepts budget
 acceptBudget(requestId: number, clientId: number) {
   return this.http.post<EventRequest>(
     `${this.baseUrl}/api/client/requests/${requestId}/accept-budget`,
@@ -58,7 +58,7 @@ acceptBudget(requestId: number, clientId: number) {
   );
 }
 
-// ✅ Client rejects budget
+// Client rejects budget
 rejectBudget(requestId: number, clientId: number) {
   return this.http.post<EventRequest>(
     `${this.baseUrl}/api/client/requests/${requestId}/reject-budget`,
@@ -67,7 +67,7 @@ rejectBudget(requestId: number, clientId: number) {
   );
 }
 
-// ✅ Payments list (to show Pay Now status)
+// Payments list (to show Pay Now status)
 getMyPayments(clientId: number) {
   return this.http.get<Payment[]>(
     `${this.baseUrl}/api/client/payments`,
@@ -75,7 +75,7 @@ getMyPayments(clientId: number) {
   );
 }
 
-// ✅ Create Razorpay QR (Pay Now)
+// Create Razorpay QR (Pay Now)
 createRazorpayQr(paymentId: number, clientId: number) {
   return this.http.post<Payment>(
     `${this.baseUrl}/api/client/payments/${paymentId}/razorpay/qr`,
@@ -84,7 +84,7 @@ createRazorpayQr(paymentId: number, clientId: number) {
   );
 }
 
-// ✅ Poll payment status (backup)
+// Poll payment status (backup)
 getPayment(paymentId: number, clientId: number) {
   return this.http.get<Payment>(
     `${this.baseUrl}/api/client/payments/${paymentId}`,

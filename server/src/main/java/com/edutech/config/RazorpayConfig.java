@@ -17,7 +17,7 @@ public class RazorpayConfig {
     @Bean
     public RazorpayClient razorpayClient() throws Exception {
 
-        // ✅ HARD LOCK: demo/test only
+        // HARD LOCK: demo/test only
         if (keyId == null || !keyId.startsWith("rzp_test_")) {
             throw new IllegalStateException("Demo mode: Only rzp_test_ keys are allowed");
         }

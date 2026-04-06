@@ -24,7 +24,7 @@
     <div class="section-head">
       <h2>Events</h2>
 
-      <!-- ✅ View toggle -->
+      <!-- View toggle -->
       <div class="view-toggle">
         <button class="toggle-btn" [class.active]="eventsViewMode==='cards'" (click)="toggleEventsView('cards')">
           Cards
@@ -102,7 +102,7 @@
       </form>
     </div>
 
-    <!-- ✅ CARDS VIEW -->
+    <!--  CARDS VIEW -->
     <div *ngIf="eventsViewMode === 'cards'" class="events-grid">
       <div class="event-card" *ngFor="let e of events">
         <div class="event-card-top">
@@ -161,7 +161,7 @@
       </div>
     </div>
 
-    <!-- ✅ TABLE VIEW -->
+    <!--  TABLE VIEW -->
     <table class="data-table" *ngIf="eventsViewMode === 'table'">
       <tr>
         <th>Title</th>

@@ -32,7 +32,7 @@ public class OtpService {
         return email + ":" + purpose;
     }
 
-    // ✅ Generate / resend OTP with purpose (REGISTER / RESET_PASSWORD)
+    //  Generate / resend OTP with purpose (REGISTER / RESET_PASSWORD)
     public String generateOrResendOtp(String email, String purpose) {
 
         String k = key(email, purpose);
@@ -67,7 +67,7 @@ public class OtpService {
         return otp;
     }
 
-    // ✅ Verify OTP (purpose-specific)
+    //  Verify OTP 
     public boolean verifyOtp(String email, String otp, String purpose) {
 
         String k = key(email, purpose);

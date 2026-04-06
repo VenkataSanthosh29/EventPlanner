@@ -37,7 +37,7 @@ public class SecurityConfig {
                     "/api/user/exists/**",
                     "/api/user/forgot-password/**",
 
-                    // ✅ Razorpay webhook must be public
+                    // Razorpay webhook must be public
                     "/api/payments/razorpay/webhook"
                 ).permitAll()
 

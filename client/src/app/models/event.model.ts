@@ -11,12 +11,8 @@ export interface Event {
   description: string;
   status: string;
   feedback?: string;
-
-  // ✅ rating + event type
   rating?: number;
   eventType?: string;
-
-  // ✅ NEW: planner info for "Planned By" column
   planner?: EventPlannerInfo;
 }
 

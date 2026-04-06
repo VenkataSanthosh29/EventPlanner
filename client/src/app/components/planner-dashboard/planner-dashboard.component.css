@@ -1,9 +1,3 @@
-/* =========================================================
-   Planner Dashboard (Full CSS)
-   Works with: top-bar, brand-block, cards/table toggle,
-   event cards, table view, requests, profile stats.
-   ========================================================= */
-
 :host {
   display: block;
   --bg: #0b0b15;

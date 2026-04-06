@@ -19,7 +19,7 @@ export class ClientDashboardComponent implements OnInit {
   username!: string;
   clientId!: number;
 
-  // ✅ unified tab state
+  //  unified tab state
   activeTab: ClientTab = 'all';
 
   // Data
@@ -27,10 +27,10 @@ export class ClientDashboardComponent implements OnInit {
   myEvents: Event[] = [];
   myRequests: EventRequest[] = [];
 
-  // ✅ eligible events (only from AGREED requests)
+  //  eligible events (only from AGREED requests)
   eligibleEventIds = new Set<number>();
 
-  // ✅ payments (for Pay Now)
+  //  payments (for Pay Now)
   payments: Payment[] = [];
   paymentByEventId = new Map<number, Payment>();
 
@@ -75,7 +75,7 @@ export class ClientDashboardComponent implements OnInit {
     this.loadAllData();
   }
 
-  // ✅ clean tab switch
+  //  clean tab switch
   setTab(tab: ClientTab): void {
     this.activeTab = tab;
     this.cancelEdit();
@@ -204,7 +204,7 @@ export class ClientDashboardComponent implements OnInit {
     return found ? found.emoji : '—';
   }
 
-  // ✅ NEW RULE: feedback only if eligible AND event is COMPLETED
+  // feedback only if eligible AND event is COMPLETED
   canGiveFeedback(event: Event): boolean {
     return !!event.id && this.eligibleEventIds.has(Number(event.id)) && event.status === 'COMPLETED';
   }

@@ -33,7 +33,7 @@ public class PlannerProfileController {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    // ✅ Updated profile with split counts + revenue
+    //  Updated profile with split counts + revenue
     @GetMapping("/profile")
     public ResponseEntity<PlannerProfileDto> getPlannerProfile(@RequestParam Long plannerId) {
 
@@ -104,7 +104,7 @@ public class PlannerProfileController {
         return ResponseEntity.ok(dto);
     }
 
-    // ✅ Planner payments so dashboard can show Paid/Not Paid per event
+    //  Planner payments so dashboard can show Paid/Not Paid per event
     @GetMapping("/payments")
     public ResponseEntity<List<Payment>> getPlannerPayments(@RequestParam Long plannerId) {
 

@@ -32,7 +32,7 @@ public class EventRequestService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    // ✅ Client creates request
+    // client creates request
     public EventRequest createRequest(Long plannerId, EventRequestCreateDto dto) {
 
         EventPlanner planner = plannerRepository.findById(plannerId)
@@ -49,8 +49,6 @@ public class EventRequestService {
         req.setPreferredDate(dto.getPreferredDate());
         req.setLocation(dto.getLocation());
         req.setDescription(dto.getDescription());
-
-        // New flow defaults
         req.setStatus("PENDING");
         req.setBudgetStatus("PENDING");
 
@@ -65,7 +63,7 @@ public class EventRequestService {
         return requestRepository.findByClientIdOrderByCreatedAtDesc(clientId);
     }
 
-    // ✅ Planner proposes budget
+    // Planner proposes budget
     public EventRequest proposeBudget(Long requestId, Double budget) {
 
         EventRequest req = requestRepository.findById(requestId)
@@ -87,7 +85,7 @@ public class EventRequestService {
         return requestRepository.save(req);
     }
 
-    // ✅ Client accepts budget -> AGREED -> create Event + Payment
+    //  Client accepts budget -> AGREED -> create Event + Payment
     public EventRequest acceptBudget(Long requestId, Long clientId) {
 
         EventRequest req = requestRepository.findById(requestId)
@@ -105,7 +103,7 @@ public class EventRequestService {
         req.setFinalBudget(req.getBudgetProposed());
         req.setStatus("AGREED");
 
-        // ✅ Create Event ONLY after agreement
+        // Create Event ONLY after agreement
         EventPlanner planner = plannerRepository.findById(req.getPlannerId())
                 .orElseThrow(() -> new RuntimeException("Planner not found"));
 
@@ -121,7 +119,7 @@ public class EventRequestService {
         Event createdEvent = eventRepository.save(event);
         req.setCreatedEventId(createdEvent.getId());
 
-        // ✅ Create Payment row (QR will be generated only after event COMPLETED)
+        // Create Payment row (QR will be generated only after event COMPLETED)
         Payment payment = new Payment();
         payment.setEventId(createdEvent.getId());
         payment.setClientId(req.getClientId());
@@ -134,7 +132,7 @@ public class EventRequestService {
         return requestRepository.save(req);
     }
 
-    // ✅ Client rejects budget -> REJECTED
+    //  Client rejects budget -> REJECTED
     public EventRequest rejectBudget(Long requestId, Long clientId) {
 
         EventRequest req = requestRepository.findById(requestId)

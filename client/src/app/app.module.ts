@@ -31,7 +31,7 @@ import { PaymentComponent } from './components/payment/payment.component';
     ClientRequestsComponent,
     ForgotPasswordComponent,
     PaymentComponent,
-    HomeComponent // ✅ IMPORTANT
+    HomeComponent 
   ],
   imports: [
     BrowserModule,

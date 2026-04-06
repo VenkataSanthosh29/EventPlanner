@@ -20,7 +20,6 @@ export class AuthInterceptor implements HttpInterceptor {
 
     const token = this.authService.getToken();
 
-    // ✅ Attach token if available
     if (token) {
       const authReq = req.clone({
         setHeaders: {

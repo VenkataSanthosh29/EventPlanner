@@ -14,25 +14,16 @@ import { ForgotPasswordComponent } from './components/forgot-password/forgot-pas
 import { PaymentComponent } from './components/payment/payment.component';
 
 export const routes: Routes = [
-  // Initial page
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-
-  // Public pages
   { path: 'home', component: HomeComponent },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
-
-  // Dashboards
   { path: 'planner-dashboard', component: PlannerDashboardComponent },
   { path: 'staff-dashboard', component: StaffDashboardComponent },
   { path: 'client-dashboard', component: ClientDashboardComponent },
-
-  // Extra routes
   { path: 'planner-profile/:plannerId', component: PlannerProfileComponent },
   { path: 'client-requests', component: ClientRequestsComponent },
   { path: 'payment/:paymentId', component: PaymentComponent },
-
-  // Fallback route
   { path: '**', redirectTo: 'home' }
 ];
