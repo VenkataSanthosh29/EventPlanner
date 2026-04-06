@@ -106,8 +106,6 @@ public void markDemoSuccess(Long paymentId, Long clientId) {
     if ("SUCCESS".equals(p.getStatus())) return;
 
     p.setStatus("SUCCESS");
-
-    // If paidAt exists, keep it. If not, comment this line.
     p.setPaidAt(LocalDateTime.now());
 
     paymentRepository.save(p);

@@ -24,7 +24,7 @@ public class TaskService {
     @Autowired
     private EventRepository eventRepository;
 
-    // ✅ Planner: Create task under a specific event
+    //  Planner: Create task under a specific event
     public Task createTaskForEvent(Long eventId, Task task) {
 
         Event event = eventRepository.findById(eventId)
@@ -38,12 +38,12 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // ✅ Planner: Get all tasks
+    // Planner: Get all tasks
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
     }
 
-    // ✅ Planner: Assign task to staff
+    // Planner: Assign task to staff
     public Task assignTask(Long taskId, Long staffId) {
 
         Task task = taskRepository.findById(taskId)
@@ -56,12 +56,12 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // ✅ Staff: View assigned tasks
+    // Staff: View assigned tasks
     public List<Task> getAssignedTasks(Long staffId) {
         return taskRepository.findByAssignedStaffId(staffId);
     }
 
-    // ✅ Staff: Update task status forward-only
+    //  Staff: Update task status forward-only
     public Task updateTaskStatus(Long taskId, String status) {
 
         Task task = taskRepository.findById(taskId)
@@ -89,7 +89,7 @@ public class TaskService {
         return taskRepository.save(task);
     }
 
-    // ✅ Used when Event becomes COMPLETED
+    // Used when Event becomes COMPLETED
     public void completePendingTasksForEvent(Long eventId) {
         List<Task> pending = taskRepository.findByEventIdAndStatusNot(eventId, "COMPLETED");
         for (Task t : pending) {
@@ -98,7 +98,7 @@ public class TaskService {
         taskRepository.saveAll(pending);
     }
 
-    // ✅ Tasks by Event (for UI filtering)
+    // Tasks by Event (for UI filtering)
     public List<Task> getTasksByEvent(Long eventId) {
         return taskRepository.findByEventId(eventId);
     }

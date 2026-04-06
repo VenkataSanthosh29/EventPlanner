@@ -109,7 +109,7 @@ public boolean existsByEmail(String email) {
     return userRepository.existsByEmail(email);
 }
 
-// ✅ update password by email (BCrypt)
+// update password by email (BCrypt)
 public void updatePasswordByEmail(String email, String newPassword) {
     User user = userRepository.findByEmail(email)
             .orElseThrow(() -> new RuntimeException("Invalid email"));
