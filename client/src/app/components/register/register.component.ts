@@ -37,7 +37,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private auth: AuthService,
     private router: Router,
-    private route: ActivatedRoute // ✅ NEW
+    private route: ActivatedRoute 
   ) {
     this.registrationForm = this.fb.group({
       username: ['', {
@@ -56,7 +56,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // ✅ NEW: Prefill role from home page buttons: /register?role=PLANNER/CLIENT/STAFF
+    
     this.applyRoleFromQuery();
   }
 
@@ -64,7 +64,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
     if (this.resendTimer) clearInterval(this.resendTimer);
   }
 
-  // ✅ NEW: read role query param and set it (without locking)
+  //  read role query param and set it 
   private applyRoleFromQuery(): void {
     this.route.queryParamMap.subscribe(params => {
       const role = (params.get('role') || '').toUpperCase();
@@ -74,9 +74,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
       const roleCtrl = this.registrationForm.get('role');
       if (!roleCtrl) return;
-
-      // ✅ Don't override if user already selected something manually
-      // (so they can still change the role later)
       const current = (roleCtrl.value || '').toString().toUpperCase();
 
       // If empty OR untouched/pristine, set from query param
@@ -104,9 +101,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     orb.style.opacity = '1';
   }
 
-  /* =====================
-     SEND OTP → OPEN POPUP
-     ===================== */
+  
+     //SEND OTP → OPEN POPUP
+    
   sendOtp(): void {
     const emailCtrl = this.registrationForm.get('email');
     if (!emailCtrl) return;
@@ -163,7 +160,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
       next: () => {
         this.otpVerified = true;
         this.otpError = null;
-        // ❌ No redirect here
+        //  No redirect here
       },
       error: () => {
         this.otpVerified = false;
@@ -196,9 +193,9 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  /* =====================
-     ASYNC VALIDATORS
-     ===================== */
+
+    // ASYNC VALIDATORS
+
   usernameExistsValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
       if (!control.value) return of(null);
@@ -224,4 +221,4 @@ export class RegisterComponent implements OnInit, OnDestroy {
       );
     };
   }
-}
+}                                                                                                                                                                                                                                                                                                 
