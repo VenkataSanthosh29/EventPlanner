@@ -1,5 +1,5 @@
 export interface PlannerProfile {
   plannerId: number;
-  plannerName: string;
+  username: string;
   averageRating: number;
 }

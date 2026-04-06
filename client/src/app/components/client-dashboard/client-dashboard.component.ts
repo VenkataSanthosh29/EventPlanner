@@ -19,24 +19,30 @@ export class ClientDashboardComponent implements OnInit {
   username!: string;
   clientId!: number;
 
-  eligibleEventIds = new Set<number>();
-
+  // ✅ unified tab state
   activeTab: ClientTab = 'all';
 
+  // Data
   events: Event[] = [];
   myEvents: Event[] = [];
   myRequests: EventRequest[] = [];
+
+  // ✅ eligible events (only from AGREED requests)
+  eligibleEventIds = new Set<number>();
 
   // ✅ payments (for Pay Now)
   payments: Payment[] = [];
   paymentByEventId = new Map<number, Payment>();
 
+  // Profile
   clientProfile: any | null = null;
   profileLoading = false;
 
+  // Feedback/rating editor
   editingEventId: number | null = null;
   feedbackForm!: FormGroup;
 
+  // Emoji rating options (1–5)
   ratingOptions = [
     { value: 1, emoji: '😡', label: 'Very Bad' },
     { value: 2, emoji: '🙁', label: 'Bad' },
@@ -48,7 +54,7 @@ export class ClientDashboardComponent implements OnInit {
   successMessage: string | null = null;
   errorMessage: string | null = null;
 
-  // ✅ avoid double clicks
+  // prevent double clicks on budget actions
   budgetActionLoading = false;
 
   constructor(
@@ -69,6 +75,7 @@ export class ClientDashboardComponent implements OnInit {
     this.loadAllData();
   }
 
+  // ✅ clean tab switch
   setTab(tab: ClientTab): void {
     this.activeTab = tab;
     this.cancelEdit();
@@ -78,9 +85,10 @@ export class ClientDashboardComponent implements OnInit {
     if (tab === 'my') this.recomputeMyEvents();
   }
 
+  // ---------- Load ----------
   loadAllData(): void {
     this.clientService.getAllEvents().subscribe(events => {
-      this.events = events;
+      this.events = events || [];
       this.recomputeMyEvents();
     });
 
@@ -90,19 +98,20 @@ export class ClientDashboardComponent implements OnInit {
 
   loadRequests(): void {
     this.clientService.getMyRequests(this.clientId).subscribe(reqs => {
-      this.myRequests = reqs;
+      this.myRequests = reqs || [];
       this.recomputeMyEvents();
     });
   }
 
   loadPayments(): void {
     this.clientService.getMyPayments(this.clientId).subscribe(pays => {
-      this.payments = pays;
+      this.payments = pays || [];
       this.paymentByEventId = new Map<number, Payment>();
-      pays.forEach(p => this.paymentByEventId.set(p.eventId, p));
+      this.payments.forEach(p => this.paymentByEventId.set(p.eventId, p));
     });
   }
 
+  // My Events = events created from AGREED requests
   private recomputeMyEvents(): void {
     if (!this.events || this.events.length === 0) {
       this.myEvents = [];
@@ -110,7 +119,6 @@ export class ClientDashboardComponent implements OnInit {
       return;
     }
 
-    // ✅ AGREED is the new accepted state (old was ACCEPTED)
     const agreedIds = new Set<number>(
       (this.myRequests || [])
         .filter(r => r.status === 'AGREED' && !!r.createdEventId)
@@ -121,6 +129,7 @@ export class ClientDashboardComponent implements OnInit {
     this.myEvents = this.events.filter(e => !!e.id && agreedIds.has(Number(e.id)));
   }
 
+  // ---------- Profile ----------
   loadProfile(): void {
     if (this.profileLoading) return;
     this.profileLoading = true;
@@ -130,7 +139,9 @@ export class ClientDashboardComponent implements OnInit {
         this.clientProfile = p;
         this.profileLoading = false;
       },
-      error: () => this.profileLoading = false
+      error: () => {
+        this.profileLoading = false;
+      }
     });
   }
 
@@ -193,14 +204,12 @@ export class ClientDashboardComponent implements OnInit {
     return found ? found.emoji : '—';
   }
 
-canGiveFeedback(event: Event): boolean {
-  return (
-    !!event.id &&
-    this.eligibleEventIds.has(Number(event.id)) &&
-    event.status === 'COMPLETED'
-  );
-}
+  // ✅ NEW RULE: feedback only if eligible AND event is COMPLETED
+  canGiveFeedback(event: Event): boolean {
+    return !!event.id && this.eligibleEventIds.has(Number(event.id)) && event.status === 'COMPLETED';
+  }
 
+  // ---------- Feedback editor ----------
   editFeedback(event: Event): void {
     if (!this.canGiveFeedback(event)) return;
 
@@ -234,6 +243,7 @@ canGiveFeedback(event: Event): boolean {
       next: () => {
         this.successMessage = 'Feedback & rating submitted successfully!';
         this.errorMessage = null;
+
         this.cancelEdit();
         this.loadAllData();
       },
@@ -249,8 +259,9 @@ canGiveFeedback(event: Event): boolean {
     this.feedbackForm.reset({ feedback: '', rating: null });
   }
 
+  // ---------- Logout ----------
   logout(): void {
     localStorage.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

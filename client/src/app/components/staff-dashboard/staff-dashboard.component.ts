@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { StaffService } from '../../services/staff.service';
 import { Task } from '../../models/task.model';
 
-type StaffTab = 'tasks' | 'profile';
+type StaffTab = 'tasks'; // ✅ Only one tab now (extend later if you want)
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -20,19 +19,10 @@ export class StaffDashboardComponent implements OnInit {
   activeTab: StaffTab = 'tasks';
 
   tasks: Task[] = [];
-  editingTaskId: number | null = null;
-
-  // ✅ Track current task status so we show only valid next steps
-  currentTaskStatus: string | null = null;
-
-  statusForm!: FormGroup;
-
-  staffProfile: any | null = null;
-  profileLoading = false;
+  loading = false;
 
   constructor(
     private staffService: StaffService,
-    private fb: FormBuilder,
     private router: Router
   ) {}
 
@@ -44,87 +34,43 @@ export class StaffDashboardComponent implements OnInit {
     }
 
     this.staffId = Number(id);
-    this.username = localStorage.getItem('username') || 'User';
+    this.username = localStorage.getItem('username') || 'Staff';
 
-    this.statusForm = this.fb.group({
-      status: ['', Validators.required]
-    });
-
-    this.loadAssignedTasks();
+    this.loadTasks();
   }
 
-setTab(tab: StaffTab): void {
-  this.activeTab = tab;
-
-  this.cancelEdit();
-
-  if (tab === 'profile') {
-    this.loadProfile();
-  }
-}
-  loadAssignedTasks(): void {
-    this.staffService.getAssignedTasks(this.staffId)
-      .subscribe(tasks => this.tasks = tasks);
+  setTab(tab: StaffTab): void {
+    this.activeTab = tab;
+    if (tab === 'tasks') this.loadTasks();
   }
 
-  // ✅ Returns allowed next statuses only (forward workflow)
-  getNextStatusOptions(): { value: string; label: string }[] {
-    if (this.currentTaskStatus === 'INITIATED') {
-      return [{ value: 'IN_PROGRESS', label: 'In Progress' }];
-    }
-    if (this.currentTaskStatus === 'IN_PROGRESS') {
-      return [{ value: 'COMPLETED', label: 'Completed' }];
-    }
-    return [];
-  }
+  loadTasks(): void {
+    this.loading = true;
 
-  editTask(task: Task): void {
-    if (task.status === 'COMPLETED') return;
-
-    this.editingTaskId = task.id!;
-    this.currentTaskStatus = task.status;
-
-    // ✅ Prefill ONLY valid next status (so Save works immediately)
-    const options = this.getNextStatusOptions();
-    const next = options.length > 0 ? options[0].value : '';
-
-    this.statusForm.setValue({ status: next });
-    this.statusForm.markAsPristine();
-    this.statusForm.markAsUntouched();
-  }
-
-  updateStatus(): void {
-    if (this.statusForm.invalid || !this.editingTaskId) return;
-
-    const { status } = this.statusForm.value;
-
-    this.staffService.updateTaskStatus(this.editingTaskId, status).subscribe(() => {
-      this.cancelEdit();
-      this.loadAssignedTasks();
-    });
-  }
-
-  cancelEdit(): void {
-    this.editingTaskId = null;
-    this.currentTaskStatus = null;
-    this.statusForm.reset();
-  }
-
-  loadProfile(): void {
-    if (this.profileLoading) return;
-    this.profileLoading = true;
-
-    this.staffService.getStaffProfile(this.staffId).subscribe({
-      next: (p: any) => {
-        this.staffProfile = p;
-        this.profileLoading = false;
+    // ✅ Replace with your actual API method name
+    this.staffService.getAssignedTasks(this.staffId).subscribe({
+      next: (data: Task[]) => {
+        this.tasks = data || [];
+        this.loading = false;
       },
-      error: () => this.profileLoading = false
+      error: () => {
+        this.loading = false;
+      }
+    });
+  }
+
+  // ✅ Optional: status updates (if you already support it)
+  updateStatus(task: Task, status: string): void {
+    if (!task?.id) return;
+
+    this.staffService.updateTaskStatus(task.id, status).subscribe({
+      next: () => this.loadTasks(),
+      error: () => {}
     });
   }
 
   logout(): void {
     localStorage.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 }

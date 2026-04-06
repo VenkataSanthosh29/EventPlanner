@@ -1,7 +1,7 @@
 <div class="top-bar">
   <div class="top-left">
     <div class="avatar">
-      {{ (profile?.plannerName || 'P').slice(0,1) | uppercase }}
+      {{ ((profile?.username|| 'P')).slice(0,1) | uppercase }}
     </div>
     <div class="title-block">
       <h1>Planner Profile</h1>
@@ -20,13 +20,15 @@
     <div class="profile-card">
       <div class="profile-main">
         <div class="profile-info">
-          <h2 class="name">{{ p.plannerName }}</h2>
+          <h2 class="name">
+            <h2 class="name">{{ p.username ||'Planner' }}</h2>
+          </h2>
           <div class="meta">
             <span class="badge rating">⭐ {{ p.averageRating | number:'1.1-1' }} / 5</span>
             <span class="badge events">📅 {{ events?.length }} Events</span>
           </div>
           <p class="desc">
-            Expert event management services by <b>{{ p.plannerName }}</b>. Browse the portfolio below or submit a custom inquiry.
+            Expert event management services by <b>{{ p.username ||'Planner'}}</b>. Browse the portfolio below or submit a custom inquiry.
           </p>
         </div>
         <div class="profile-actions">

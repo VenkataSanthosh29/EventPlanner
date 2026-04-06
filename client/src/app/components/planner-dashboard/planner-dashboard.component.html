@@ -1,8 +1,11 @@
 <!-- TOP BAR -->
 <div class="top-bar">
-  <div>
-    <h1>Planner Dashboard</h1>
-    <div class="welcome-text">Welcome, {{ username }}</div>
+  <div class="brand-block">
+    <div class="brand-logo">E</div>
+    <div>
+      <h1>Planner Dashboard</h1>
+      <div class="welcome-text">Welcome, {{ username }}</div>
+    </div>
   </div>
 
   <div class="nav-actions">
@@ -18,7 +21,19 @@
 
   <!-- ================= EVENTS TAB ================= -->
   <section *ngIf="activeTab === 'events'" class="section-card">
-    <h2>Events</h2>
+    <div class="section-head">
+      <h2>Events</h2>
+
+      <!-- ✅ View toggle -->
+      <div class="view-toggle">
+        <button class="toggle-btn" [class.active]="eventsViewMode==='cards'" (click)="toggleEventsView('cards')">
+          Cards
+        </button>
+        <button class="toggle-btn" [class.active]="eventsViewMode==='table'" (click)="toggleEventsView('table')">
+          Table
+        </button>
+      </div>
+    </div>
 
     <div class="form-card">
       <h3>{{ editingEventId ? 'Edit Event' : 'Create Event' }}</h3>
@@ -84,40 +99,111 @@
             Cancel
           </button>
         </div>
-
       </form>
     </div>
 
-    <table class="data-table">
+    <!-- ✅ CARDS VIEW -->
+    <div *ngIf="eventsViewMode === 'cards'" class="events-grid">
+      <div class="event-card" *ngFor="let e of events">
+        <div class="event-card-top">
+          <div class="event-title">{{ e.title }}</div>
+          <div class="chips">
+            <span class="chip" [ngClass]="getTimelineClass(e)">{{ getTimelineLabel(e) }}</span>
+            <span class="chip chip-type">{{ e.eventType || '—' }}</span>
+          </div>
+        </div>
+
+        <div class="event-meta">
+          <div class="meta-row">
+            <span class="meta-label">Date</span>
+            <span class="meta-value">{{ e.date | date:'dd-MM-yyyy HH:mm' }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Location</span>
+            <span class="meta-value">{{ e.location }}</span>
+          </div>
+          <div class="meta-row">
+            <span class="meta-label">Progress</span>
+            <span class="meta-value">{{ formatStatus(e.status) }}</span>
+          </div>
+        </div>
+
+        <div class="event-desc">
+          {{ e.description }}
+        </div>
+
+        <div class="event-finance" *ngIf="e.id">
+          <div class="finance-left">
+            <span class="mini-label">Payment</span>
+            <span class="mini-value">{{ getPaymentLabel(e.id) }}</span>
+          </div>
+
+          <div class="finance-right" *ngIf="isClientRequestedEvent(e.id)">
+            <span class="mini-label">Revenue</span>
+            <span class="mini-value revenue">
+              ₹ {{ getRevenueForEvent(e.id) }}
+            </span>
+          </div>
+
+          <div class="finance-right" *ngIf="!isClientRequestedEvent(e.id)">
+            <span class="mini-label">Revenue</span>
+            <span class="mini-value muted">—</span>
+          </div>
+        </div>
+
+        <div class="event-actions">
+          <button class="btn-outline"
+                  (click)="editEvent(e)"
+                  [disabled]="e.status === 'COMPLETED'">
+            Edit
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ TABLE VIEW -->
+    <table class="data-table" *ngIf="eventsViewMode === 'table'">
       <tr>
         <th>Title</th>
         <th>Type</th>
+        <th>Timeline</th>
         <th>Status</th>
         <th>Location</th>
         <th>Date</th>
         <th>Description</th>
         <th>Payment</th>
+        <th>Revenue</th>
         <th>Action</th>
       </tr>
 
       <tr *ngFor="let e of events">
         <td>{{ e.title }}</td>
         <td>{{ e.eventType || '—' }}</td>
+        <td>
+          <span class="chip" [ngClass]="getTimelineClass(e)">{{ getTimelineLabel(e) }}</span>
+        </td>
         <td>{{ formatStatus(e.status) }}</td>
         <td>{{ e.location }}</td>
         <td>{{ e.date | date:'dd-MM-yyyy HH:mm' }}</td>
         <td>{{ e.description }}</td>
-        <td>
-          <ng-container *ngIf="e.id && getPaymentForEvent(e.id) as pay; else noPay">
-           <span *ngIf="pay.status === 'SUCCESS'">✅ Paid (₹{{ pay.amount }})</span>
-            <span *ngIf="pay.status !== 'SUCCESS'">⏳ Not Paid</span>
-        </ng-container>
-      <ng-template #noPay>—</ng-template>
-      </td>
 
-      <td>
-       <button (click)="editEvent(e)" [disabled]="e.status === 'COMPLETED'">Edit</button>
-      </td>
+        <td>
+          <ng-container *ngIf="e.id; else dash">
+            {{ getPaymentLabel(e.id) }}
+          </ng-container>
+          <ng-template #dash>—</ng-template>
+        </td>
+
+        <td>
+          <ng-container *ngIf="e.id && isClientRequestedEvent(e.id); else dash2">
+            ₹ {{ getRevenueForEvent(e.id) }}
+          </ng-container>
+          <ng-template #dash2>—</ng-template>
+        </td>
+
+        <td>
+          <button class="btn-outline" (click)="editEvent(e)" [disabled]="e.status === 'COMPLETED'">Edit</button>
+        </td>
       </tr>
     </table>
   </section>
@@ -248,7 +334,6 @@
         <td>{{ r.createdEventId || '—' }}</td>
 
         <td>
-          <!-- ✅ Planner only proposes budget -->
           <div class="request-actions">
 
             <input
@@ -303,37 +388,38 @@
         </div>
       </div>
 
-    <div class="profile-stats">
-  <div class="stat">
-    <div class="stat-label">Total Events Planned</div>
-    <div class="stat-value">{{ plannerProfile.eventsPlanned }}</div>
-  </div>
+      <div class="profile-stats">
+        <div class="stat">
+          <div class="stat-label">Total Events Planned</div>
+          <div class="stat-value">{{ plannerProfile.eventsPlanned }}</div>
+        </div>
 
-  <div class="stat">
-    <div class="stat-label">Self Created Events</div>
-    <div class="stat-value">{{ plannerProfile.selfCreatedEvents }}</div>
-  </div>
+        <div class="stat">
+          <div class="stat-label">Self Created Events</div>
+          <div class="stat-value">{{ plannerProfile.selfCreatedEvents }}</div>
+        </div>
 
-  <div class="stat">
-    <div class="stat-label">Client Events (Agreed)</div>
-    <div class="stat-value">{{ plannerProfile.clientEvents }}</div>
-  </div>
+        <div class="stat">
+          <div class="stat-label">Client Events (Agreed)</div>
+          <div class="stat-value">{{ plannerProfile.clientEvents }}</div>
+        </div>
 
-  <div class="stat">
-    <div class="stat-label">Paid Client Events</div>
-    <div class="stat-value">{{ plannerProfile.paidClientEvents }}</div>
-  </div>
+        <div class="stat">
+          <div class="stat-label">Paid Client Events</div>
+          <div class="stat-value">{{ plannerProfile.paidClientEvents }}</div>
+        </div>
 
-  <div class="stat">
-    <div class="stat-label">Revenue Generated</div>
-    <div class="stat-value">₹ {{ plannerProfile.revenueGenerated }}</div>
-  </div>
+        <div class="stat">
+          <div class="stat-label">Revenue Generated</div>
+          <div class="stat-value">₹ {{ plannerProfile.revenueGenerated | number:'1.0-2' }}</div>
+        </div>
 
-  <div class="stat">
-    <div class="stat-label">Overall Rating</div>
-    <div class="stat-value">⭐ {{ plannerProfile.averageRating | number:'1.1-1' }} / 5</div>
-  </div>
-</div>
-</div>
+        <div class="stat">
+          <div class="stat-label">Overall Rating</div>
+          <div class="stat-value">⭐ {{ plannerProfile.averageRating | number:'1.1-1' }} / 5</div>
+        </div>
+      </div>
+    </div>
   </section>
+
 </div>

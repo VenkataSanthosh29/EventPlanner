@@ -9,12 +9,12 @@ import { Event } from '../../models/event.model';
 import { Task } from '../../models/task.model';
 import { User } from '../../models/user.model';
 import { EventRequest } from '../../models/event-request.model';
+import { Payment } from '../../models/payment.model';
 
 import { finalize } from 'rxjs/operators';
 
-import { Payment } from '../../models/payment.model';
-
 type PlannerTab = 'events' | 'tasks' | 'requests' | 'profile';
+type EventsViewMode = 'cards' | 'table';
 
 @Component({
   selector: 'app-planner-dashboard',
@@ -28,6 +28,9 @@ export class PlannerDashboardComponent implements OnInit {
 
   activeTab: PlannerTab = 'events';
 
+  // ✅ NEW: Table/Card view toggle
+  eventsViewMode: EventsViewMode = 'cards';
+
   events: Event[] = [];
   tasks: Task[] = [];
   staffs: User[] = [];
@@ -40,11 +43,6 @@ export class PlannerDashboardComponent implements OnInit {
   budgetInputs: Record<number, number> = {};
   budgetLoading = false;
 
-  // ✅ Payments (to show Paid / Not Paid in planner dashboard)
-plannerPayments: Payment[] = [];
-paymentByEventId = new Map<number, Payment>();
-paymentsLoading = false;
-
   // Profile
   plannerProfile: any | null = null;
   profileLoading = false;
@@ -56,6 +54,11 @@ paymentsLoading = false;
 
   // Prevent double submit
   creatingEvent = false;
+
+  // ✅ Payments (for Paid/Revenue)
+  plannerPayments: Payment[] = [];
+  paymentByEventId = new Map<number, Payment>();
+  paymentsLoading = false;
 
   // Event types
   eventTypes: string[] = [
@@ -100,9 +103,9 @@ paymentsLoading = false;
 
     this.initForms();
     this.loadEvents();
+    this.loadPlannerPayments();
     this.loadTasks();
     this.loadStaffs();
-    this.loadPlannerPayments();
 
     // Others -> customEventType required
     this.eventForm.get('eventTypePreset')?.valueChanges.subscribe((val: string) => {
@@ -140,6 +143,14 @@ paymentsLoading = false;
 
     if (tab === 'requests') this.loadRequests();
     if (tab === 'profile') this.loadProfile();
+    if (tab === 'events') {
+      this.loadEvents();
+      this.loadPlannerPayments();
+    }
+  }
+
+  toggleEventsView(mode: EventsViewMode): void {
+    this.eventsViewMode = mode;
   }
 
   initForms(): void {
@@ -149,38 +160,33 @@ paymentsLoading = false;
       location: ['', Validators.required],
       description: ['', Validators.required],
       status: ['', Validators.required],
-
       eventTypePreset: ['', Validators.required],
       customEventType: ['']
     });
 
     this.taskForm = this.fb.group({
       eventId: ['', Validators.required],
-
-      // Custom task uses staffId+description
       staffId: ['', Validators.required],
       description: ['', Validators.required],
-
-      // Planner creates INITIATED only
       status: [{ value: 'INITIATED', disabled: true }, Validators.required]
     });
   }
 
   logout(): void {
     localStorage.clear();
-    this.router.navigate(['/login']);
+    this.router.navigate(['/home']);
   }
 
   // ---------- EVENTS ----------
-loadEvents(): void {
-  this.plannerService.getEventsByPlanner(this.plannerId).subscribe({
-    next: (data) => {
-      this.events = data;
-      this.loadPlannerPayments(); // ✅ keep payment statuses up-to-date
-    },
-    error: () => {}
-  });
-}
+  loadEvents(): void {
+    this.plannerService.getEventsByPlanner(this.plannerId).subscribe({
+      next: (data) => {
+        this.events = data;
+        this.loadPlannerPayments(); // keep payment status fresh
+      },
+      error: () => {}
+    });
+  }
 
   submitEvent(): void {
     if (this.creatingEvent) return;
@@ -246,15 +252,90 @@ loadEvents(): void {
     this.eventForm.reset();
   }
 
+  // ---------- PAYMENTS ----------
+  loadPlannerPayments(): void {
+    this.paymentsLoading = true;
+
+    this.plannerService.getPlannerPayments(this.plannerId).subscribe({
+      next: (pays: Payment[]) => {
+        this.plannerPayments = pays || [];
+        this.paymentByEventId = new Map<number, Payment>();
+        this.plannerPayments.forEach(p => this.paymentByEventId.set(p.eventId, p));
+        this.paymentsLoading = false;
+      },
+      error: () => {
+        this.paymentsLoading = false;
+      }
+    });
+  }
+
+  getPaymentForEvent(eventId: number): Payment | undefined {
+    return this.paymentByEventId.get(eventId);
+  }
+
+  isClientRequestedEvent(eventId: number): boolean {
+    return !!this.getPaymentForEvent(eventId);
+  }
+
+  getRevenueForEvent(eventId: number): number {
+    const pay = this.getPaymentForEvent(eventId);
+    if (!pay) return 0;
+    return pay.status === 'SUCCESS' ? (pay.amount || 0) : 0;
+  }
+
+  getPaymentLabel(eventId: number): string {
+    const pay = this.getPaymentForEvent(eventId);
+    if (!pay) return '—';
+    if (pay.status === 'SUCCESS') return `Paid ₹${pay.amount}`;
+    if (pay.status === 'FAILED') return 'Failed';
+    return 'Not Paid';
+  }
+
+  // ---------- STATUS / TIMELINE HELPERS ----------
+  private parseEventDate(d: any): Date | null {
+    if (!d) return null;
+    const dt = new Date(d);
+    return isNaN(dt.getTime()) ? null : dt;
+  }
+
+  getTimelineStatus(e: Event): 'UPCOMING' | 'ONGOING' | 'COMPLETED' {
+    if (e.status === 'COMPLETED') return 'COMPLETED';
+
+    const dt = this.parseEventDate(e.date);
+    if (!dt) return 'ONGOING';
+
+    const now = new Date();
+    return dt.getTime() > now.getTime() ? 'UPCOMING' : 'ONGOING';
+  }
+
+  getTimelineLabel(e: Event): string {
+    const t = this.getTimelineStatus(e);
+    if (t === 'UPCOMING') return 'Upcoming';
+    if (t === 'ONGOING') return 'Ongoing';
+    return 'Completed';
+  }
+
+  getTimelineClass(e: Event): string {
+    const t = this.getTimelineStatus(e);
+    if (t === 'UPCOMING') return 'chip-upcoming';
+    if (t === 'ONGOING') return 'chip-ongoing';
+    return 'chip-completed';
+  }
+
+  formatStatus(status: string): string {
+    if (status === 'INITIATED') return 'Initiated';
+    if (status === 'IN_PROGRESS') return 'In Progress';
+    if (status === 'COMPLETED') return 'Completed';
+    return status;
+  }
+
   // ---------- TASKS ----------
   loadTasks(): void {
-    this.plannerService.getAllTasks()
-      .subscribe(data => this.tasks = data);
+    this.plannerService.getAllTasks().subscribe(data => this.tasks = data);
   }
 
   loadStaffs(): void {
-    this.staffService.getAllStaff()
-      .subscribe(data => this.staffs = data);
+    this.staffService.getAllStaff().subscribe(data => this.staffs = data);
   }
 
   hasSelectedTemplateTasks(): boolean {
@@ -304,9 +385,7 @@ loadEvents(): void {
       const payload: Partial<Task> = { description: taskName, status: 'INITIATED' };
 
       this.plannerService.createTaskForEvent(eventId, payload).subscribe(created => {
-        this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => {
-          this.loadTasks();
-        });
+        this.plannerService.assignTaskToStaff(created.id!, staffId).subscribe(() => this.loadTasks());
       });
     });
 
@@ -316,7 +395,7 @@ loadEvents(): void {
     });
   }
 
-  // ---------- REQUESTS (NEW FLOW: propose budget only) ----------
+  // ---------- REQUESTS ----------
   loadRequests(): void {
     this.requestsLoading = true;
     this.plannerService.getRequests(this.plannerId).subscribe({
@@ -324,7 +403,6 @@ loadEvents(): void {
         this.requests = data;
         this.requestsLoading = false;
 
-        // init budget inputs for pending requests
         data.forEach(r => {
           if (r.id && this.budgetInputs[r.id] == null && r.budgetProposed) {
             this.budgetInputs[r.id] = r.budgetProposed;
@@ -368,14 +446,6 @@ loadEvents(): void {
     });
   }
 
-  // ---------- Display helpers ----------
-  formatStatus(status: string): string {
-    if (status === 'INITIATED') return 'Initiated';
-    if (status === 'IN_PROGRESS') return 'In Progress';
-    if (status === 'COMPLETED') return 'Completed';
-    return status;
-  }
-
   formatRequestStatus(status: string): string {
     if (status === 'PENDING') return 'Pending';
     if (status === 'BUDGET_PROPOSED') return 'Budget Proposed';
@@ -383,24 +453,4 @@ loadEvents(): void {
     if (status === 'REJECTED') return 'Rejected';
     return status;
   }
-
-  loadPlannerPayments(): void {
-  this.paymentsLoading = true;
-
-  this.plannerService.getPlannerPayments(this.plannerId).subscribe({
-    next: (pays: Payment[]) => {
-      this.plannerPayments = pays || [];
-      this.paymentByEventId = new Map<number, Payment>();
-      this.plannerPayments.forEach(p => this.paymentByEventId.set(p.eventId, p));
-      this.paymentsLoading = false;
-    },
-    error: () => {
-      this.paymentsLoading = false;
-    }
-  });
-}
-
-getPaymentForEvent(eventId: number): Payment | undefined {
-  return this.paymentByEventId.get(eventId);
-}
 }
