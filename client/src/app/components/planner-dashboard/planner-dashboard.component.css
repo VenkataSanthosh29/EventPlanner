@@ -696,3 +696,32 @@ width: 100%;
   width: 100vw;
   min-height: 100vh;
 }
+
+/* ✅ Fix dropdown options visibility (native select list) */
+.grid-form select,
+.template-staff,
+.grid-form select option,
+.template-staff option {
+  color: rgba(255, 255, 255, 0.92) !important;
+  background-color: #0f1022 !important; /* dark dropdown */
+}
+
+/* Some browsers use optgroup too */
+.grid-form select optgroup,
+.template-staff optgroup {
+  color: rgba(255, 255, 255, 0.92) !important;
+  background-color: #0f1022 !important;
+}
+
+/* Improve selected/hovered option visibility */
+.grid-form select option:checked,
+.template-staff option:checked {
+  background-color: rgba(123, 63, 228, 0.35) !important;
+  color: #ffffff !important;
+}
+
+/* ✅ Helps Chrome/Edge pick correct native palette */
+.grid-form select,
+.template-staff {
+  color-scheme: dark;
+}
