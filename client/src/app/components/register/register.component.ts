@@ -1,30 +1,37 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  Validators,
+  AbstractControl,
+  AsyncValidatorFn
+} from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { debounceTime, distinctUntilChanged, switchMap, map, of } from 'rxjs';
 
 @Component({
   selector: 'app-registration',
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent {
+export class RegisterComponent implements OnDestroy {
 
   @ViewChild('authOrb') authOrbRef!: ElementRef<HTMLDivElement>;
 
   currentTheme: 'day' | 'night' = 'night';
   registrationForm: FormGroup;
 
-  otpSent = false;
-  otpVerified = false;
-  otpValue = '';
-  resendCooldown = 0;
   showPassword = false;
 
-  /* ✅ POPUP STATE */
-  showOtpPopup = false;
-  otpPopupMessage = '';
-  otpPopupSuccess = false;
+  /* OTP POPUP STATE */
+  showOtpBox = false;
+  otpValue = '';
+  otpVerified = false;
+  otpError: string | null = null;
+
+  resendCooldown = 0;
+  private resendTimer: any;
 
   constructor(
     private fb: FormBuilder,
@@ -32,30 +39,33 @@ export class RegisterComponent {
     private router: Router
   ) {
     this.registrationForm = this.fb.group({
-      username: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
+      username: ['', {
+        validators: [Validators.required],
+        asyncValidators: [this.usernameExistsValidator()],
+        updateOn: 'blur'
+      }],
+      email: ['', {
+        validators: [Validators.required, Validators.email],
+        asyncValidators: [this.emailExistsValidator()],
+        updateOn: 'blur'
+      }],
       password: ['', [Validators.required, Validators.minLength(8)]],
       role: ['', Validators.required]
     });
   }
 
-  /* =====================
-     THEME
-     ===================== */
+  ngOnDestroy(): void {
+    if (this.resendTimer) clearInterval(this.resendTimer);
+  }
+
   toggleTheme(): void {
     this.currentTheme = this.currentTheme === 'night' ? 'day' : 'night';
   }
 
-  /* =====================
-     PASSWORD
-     ===================== */
   togglePassword(): void {
     this.showPassword = !this.showPassword;
   }
 
-  /* =====================
-     CURSOR ORB
-     ===================== */
   onMouseMove(event: MouseEvent): void {
     const orb = this.authOrbRef?.nativeElement;
     if (!orb) return;
@@ -66,35 +76,46 @@ export class RegisterComponent {
   }
 
   /* =====================
-     SEND OTP
+     SEND OTP → OPEN POPUP
      ===================== */
   sendOtp(): void {
-    const email = this.registrationForm.get('email')?.value;
-    if (!email) return;
+    const emailCtrl = this.registrationForm.get('email');
+    if (!emailCtrl) return;
 
-    this.auth.sendOtp(email).subscribe({
+    if (emailCtrl.invalid) {
+      emailCtrl.markAsTouched();
+      return;
+    }
+
+    if (emailCtrl.hasError('emailTaken')) {
+      emailCtrl.markAsTouched();
+      return;
+    }
+
+    this.otpError = null;
+
+    this.auth.sendOtp(emailCtrl.value).subscribe({
       next: () => {
-        this.otpSent = true;
+        this.showOtpBox = true;
+        this.otpVerified = false;
+        this.otpValue = '';
         this.startCooldown();
       },
       error: () => {
-        this.showPopup(false, 'Failed to send OTP');
+        this.otpError = 'Failed to send OTP';
+        this.showOtpBox = true;
       }
     });
   }
 
   startCooldown(): void {
     this.resendCooldown = 30;
-    const timer = setInterval(() => {
-      if (--this.resendCooldown <= 0) {
-        clearInterval(timer);
-      }
+    clearInterval(this.resendTimer);
+    this.resendTimer = setInterval(() => {
+      if (--this.resendCooldown <= 0) clearInterval(this.resendTimer);
     }, 1000);
   }
 
-  /* =====================
-     OTP INPUT
-     ===================== */
   getCleanOtp(): string {
     return this.otpValue.replace(/\D/g, '');
   }
@@ -103,33 +124,33 @@ export class RegisterComponent {
     this.otpValue = this.getCleanOtp();
   }
 
-  /* =====================
-     VERIFY OTP ✅ NO REDIRECT HERE
-     ===================== */
   verifyOtp(): void {
     const email = this.registrationForm.get('email')?.value;
     const otp = this.getCleanOtp();
 
+    this.otpError = null;
+
     this.auth.verifyOtp(email, otp).subscribe({
       next: () => {
         this.otpVerified = true;
-        this.showPopup(true, 'OTP verified successfully');
-        // ✅ NO REDIRECT HERE
+        this.otpError = null;
+        // ❌ No redirect here (as you asked)
       },
       error: () => {
-        this.showPopup(false, 'Invalid or expired OTP');
+        this.otpVerified = false;
+        this.otpError = 'Invalid or expired OTP';
       }
     });
   }
 
-  /* =====================
-     REGISTER USER ✅ REDIRECT HERE
-     ===================== */
+  closeOtpPopup(): void {
+    this.showOtpBox = false;
+    this.otpValue = '';
+    this.otpError = null;
+  }
+
   onSubmit(): void {
-    if (!this.otpVerified) {
-      this.showPopup(false, 'Please verify OTP first');
-      return;
-    }
+    if (!this.otpVerified) return;
 
     if (this.registrationForm.invalid) {
       this.registrationForm.markAllAsTouched();
@@ -138,29 +159,40 @@ export class RegisterComponent {
 
     this.auth.createUser(this.registrationForm.value).subscribe({
       next: () => {
-        this.showPopup(true, 'Registration successful');
-
-        /* ✅ Redirect AFTER registration only */
-        setTimeout(() => {
-          this.router.navigate(['/login']);
-        }, 2000);
+        setTimeout(() => this.router.navigate(['/login']), 2000);
       },
       error: () => {
-        this.showPopup(false, 'Registration failed');
+        this.otpError = 'Registration failed';
       }
     });
   }
 
   /* =====================
-     POPUP HANDLER
+     ASYNC VALIDATORS
      ===================== */
-  showPopup(success: boolean, message: string): void {
-    this.otpPopupSuccess = success;
-    this.otpPopupMessage = message;
-    this.showOtpPopup = true;
+  usernameExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      if (!control.value) return of(null);
 
-    setTimeout(() => {
-      this.showOtpPopup = false;
-    }, 2000);
+      return of(control.value).pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(username => this.auth.checkUsernameExists(username)),
+        map(exists => (exists ? { usernameTaken: true } : null))
+      );
+    };
+  }
+
+  emailExistsValidator(): AsyncValidatorFn {
+    return (control: AbstractControl) => {
+      if (!control.value || control.invalid) return of(null);
+
+      return of(control.value).pipe(
+        debounceTime(400),
+        distinctUntilChanged(),
+        switchMap(email => this.auth.checkEmailExists(email)),
+        map(exists => (exists ? { emailTaken: true } : null))
+      );
+    };
   }
 }

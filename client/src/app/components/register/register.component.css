@@ -607,37 +607,125 @@ button.secondary:disabled {
   transform: translateY(-1px);
   background: rgba(255,255,255,0.10);
 }
+/* OTP popup backdrop */
 .otp-popup-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.6);
+  background: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
 }
 
-.otp-popup {
-  min-width: 260px;
-  padding: 20px 24px;
-  border-radius: 14px;
+/* Popup small page */
+.otp-popup-card {
+  width: 340px;
+  padding: 22px 20px;
+  border-radius: 18px;
+  background: radial-gradient(circle at top, #111827, #020617 70%);
+  border: 1px solid rgba(148,163,184,0.45);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+  position: relative;
   text-align: center;
-  animation: fadeIn 0.2s ease;
+  animation: otpPopupIn 0.25s ease;
 }
 
-.otp-popup.success {
-  background: #14532d;
-  color: #bbf7d0;
-  border: 1px solid #4ade80;
+.otp-popup-card input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(55,65,81,0.9);
+  background: rgba(15,23,42,0.96);
+  color: #f9fafb;
+  font-size: 1rem;
+  letter-spacing: 0.25em;
+  text-align: center;
 }
 
-.otp-popup.error {
-  background: #7f1d1d;
+.otp-success {
+  margin-top: 10px;
+  color: #4ade80;
+  font-size: 0.85rem;
+}
+
+.otp-error {
+  margin-top: 10px;
+  color: #f87171;
+  font-size: 0.85rem;
+}
+
+@keyframes otpPopupIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Close (X) button */
+.otp-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  background: transparent;
+  border: none;
+  color: #e5e7eb;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.otp-close-btn:hover {
+  color: #f87171;       /* red on hover */
+  transform: scale(1.15);
+}
+
+/* Optional: smoother fade-out support */
+.otp-popup-backdrop.closing {
+  animation: otpPopupOut 0.2s ease forwards;
+}
+
+@keyframes otpPopupOut {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+/* ===============================
+   ANGULAR FORM VALIDATION STATES
+   =============================== */
+
+/* Red border when invalid & touched */
+.form-group input.ng-invalid.ng-touched,
+.form-group select.ng-invalid.ng-touched {
+  border-color: #f87171 !important;
+  box-shadow:
+    0 0 0 1px rgba(248, 113, 113, 0.7),
+    0 10px 22px rgba(127, 29, 29, 0.45);
+}
+
+/* Green border when valid */
+.form-group input.ng-valid.ng-touched,
+.form-group select.ng-valid.ng-touched {
+  border-color: #4ade80 !important;
+  box-shadow:
+    0 0 0 1px rgba(74, 222, 128, 0.6),
+    0 10px 22px rgba(22, 101, 52, 0.35);
+}
+
+/* Specific: username/email already exists */
+.form-group input.ng-invalid.ng-touched[formcontrolname="username"],
+.form-group input.ng-invalid.ng-touched[formcontrolname="email"] {
+  border-color: #f87171 !important;
+}
+
+/* Error text spacing */
+.form-group .error {
+  margin-top: 4px;
+  font-size: 0.78rem;
   color: #fecaca;
-  border: 1px solid #f87171;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
 }
