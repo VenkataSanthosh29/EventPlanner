@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef, OnDestroy } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -6,7 +6,7 @@ import {
   AbstractControl,
   AsyncValidatorFn
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { debounceTime, distinctUntilChanged, switchMap, map, of } from 'rxjs';
 
@@ -15,7 +15,7 @@ import { debounceTime, distinctUntilChanged, switchMap, map, of } from 'rxjs';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
-export class RegisterComponent implements OnDestroy {
+export class RegisterComponent implements OnInit, OnDestroy {
 
   @ViewChild('authOrb') authOrbRef!: ElementRef<HTMLDivElement>;
 
@@ -36,7 +36,8 @@ export class RegisterComponent implements OnDestroy {
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute // ✅ NEW
   ) {
     this.registrationForm = this.fb.group({
       username: ['', {
@@ -54,8 +55,36 @@ export class RegisterComponent implements OnDestroy {
     });
   }
 
+  ngOnInit(): void {
+    // ✅ NEW: Prefill role from home page buttons: /register?role=PLANNER/CLIENT/STAFF
+    this.applyRoleFromQuery();
+  }
+
   ngOnDestroy(): void {
     if (this.resendTimer) clearInterval(this.resendTimer);
+  }
+
+  // ✅ NEW: read role query param and set it (without locking)
+  private applyRoleFromQuery(): void {
+    this.route.queryParamMap.subscribe(params => {
+      const role = (params.get('role') || '').toUpperCase();
+      const allowed = ['CLIENT', 'PLANNER', 'STAFF'];
+
+      if (!allowed.includes(role)) return;
+
+      const roleCtrl = this.registrationForm.get('role');
+      if (!roleCtrl) return;
+
+      // ✅ Don't override if user already selected something manually
+      // (so they can still change the role later)
+      const current = (roleCtrl.value || '').toString().toUpperCase();
+
+      // If empty OR untouched/pristine, set from query param
+      if (!current || roleCtrl.pristine) {
+        roleCtrl.setValue(role);
+        // do NOT disable; user can change it
+      }
+    });
   }
 
   toggleTheme(): void {
@@ -134,7 +163,7 @@ export class RegisterComponent implements OnDestroy {
       next: () => {
         this.otpVerified = true;
         this.otpError = null;
-        // ❌ No redirect here (as you asked)
+        // ❌ No redirect here
       },
       error: () => {
         this.otpVerified = false;
