@@ -28,15 +28,15 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
-      username: ['', [
-        Validators.required,
-        Validators.pattern(/^[a-zA-Z0-9]+$/)
-      ]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(8)
-      ]]
-    });
+  username: ['', [
+    Validators.required,
+    Validators.pattern(/^[a-zA-Z0-9_]+$/) // ✅ allow underscore
+  ]],
+  password: ['', [
+    Validators.required,
+    Validators.minLength(8)
+  ]]
+  });
   }
 
 
@@ -84,12 +84,11 @@ export class LoginComponent implements OnInit {
 
 
   onSubmit(): void {
-
-    if (this.loginForm.invalid) {
-      this.errorMessage = 'Please fill out the form correctly.';
-      return;
-    }
-
+ if (this.loginForm.invalid) {
+  this.loginForm.markAllAsTouched();
+  this.errorMessage = 'Please fill out the form correctly.';
+  return;
+}
     this.errorMessage = null;
 
     this.authService.login(this.loginForm.value).pipe(

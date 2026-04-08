@@ -292,6 +292,7 @@ width: 100%;
   opacity: 0.75;
 }
 
+
 .primary,
 .secondary,
 .btn-outline {
@@ -301,11 +302,12 @@ width: 100%;
   font-size: 12px;
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border 0.15s ease;
+  color:rgb(206, 214, 215)
 }
 
 .primary {
   border: none;
-  color: #fff;
+  color: #100202;
   background: var(--grad);
   box-shadow: 0 16px 40px rgba(236,72,153,0.18);
 }
@@ -983,4 +985,67 @@ width: 100%;
 /* Extra: ensure section heading is visible */
 :host.day .section-card h2{
   color: rgba(15,23,42,0.92) !important;
+}
+
+/* ===============================
+   FIX: Edit button visibility
+   =============================== */
+
+/* Make Edit button visible in cards */
+.event-actions .btn-outline {
+  background: rgba(15, 23, 42, 0.06);
+  color: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(15, 23, 42, 0.2);
+  font-weight: 900;
+}
+
+/* Hover effect */
+.event-actions .btn-outline:hover {
+  background: rgba(123, 63, 228, 0.12);
+  border-color: rgba(123, 63, 228, 0.45);
+  color: #4c1d95;
+}
+
+/* Disabled Edit button */
+.event-actions .btn-outline:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+/* =========================================================
+   FIX: Edit button visibility in both themes
+   (Planner Dashboard - Cards View)
+   ========================================================= */
+
+/* Night mode: Edit must be bright */
+:host.night .event-actions .btn-outline {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: rgba(255, 255, 255, 0.92) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  font-weight: 900;
+}
+
+:host.night .event-actions .btn-outline:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(236, 72, 153, 0.45) !important;
+  color: #ffffff !important;
+}
+
+/* Day mode: Edit must be dark */
+:host.day .event-actions .btn-outline {
+  background: rgba(15, 23, 42, 0.06) !important;
+  color: rgba(15, 23, 42, 0.92) !important;
+  border: 1px solid rgba(15, 23, 42, 0.20) !important;
+  font-weight: 900;
+}
+
+:host.day .event-actions .btn-outline:hover:not(:disabled) {
+  background: rgba(123, 63, 228, 0.12) !important;
+  border-color: rgba(123, 63, 228, 0.45) !important;
+  color: #4c1d95 !important;
+}
+
+/* Disabled state */
+.event-actions .btn-outline:disabled {
+  opacity: 0.45 !important;
+  cursor: not-allowed !important;
 }

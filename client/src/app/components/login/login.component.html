@@ -46,6 +46,10 @@
             formControlName="username"
             placeholder="Enter username"
           />
+
+          <small class="ep-error" *ngIf="loginForm.get('username')?.touched && loginForm.get('username')?.invalid">
+  Username can contain only letters, numbers and underscore (_).
+</small>
         </div>
 
         <div class="ep-form-group">
