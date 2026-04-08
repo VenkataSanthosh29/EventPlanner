@@ -1,5 +1,9 @@
-:host {
-  display: block;
+/* =========================================================
+   THEME VARIABLES (Night + Day)
+   Applied via :host.day / :host.night (HostBinding in TS)
+   ========================================================= */
+
+:host.night {
   --bg: #0b0b15;
   --bg2: #101024;
   --card: rgba(255,255,255,0.06);
@@ -14,10 +18,32 @@
   --pink: #ec4899;
   --grad: linear-gradient(90deg, #7b3fe4 0%, #ec4899 100%);
 
-  --shadow: 0 18px 55px rgba(0,0,0,0.35);
-  --shadow2: 0 10px 26px rgba(0,0,0,0.25);
+  color-scheme: dark;
 }
 
+:host.day {
+  --bg: #f4f7ff;
+  --bg2: #eef2ff;
+  --card: rgba(15, 23, 42, 0.06);
+  --card2: rgba(15, 23, 42, 0.08);
+  --stroke: rgba(15, 23, 42, 0.12);
+  --stroke2: rgba(15, 23, 42, 0.18);
+  --text: rgba(15, 23, 42, 0.92);
+  --muted: rgba(15, 23, 42, 0.65);
+  --muted2: rgba(15, 23, 42, 0.45);
+
+  --purple: #7b3fe4;
+  --pink: #ec4899;
+  --grad: linear-gradient(90deg, #7b3fe4 0%, #ec4899 100%);
+
+  color-scheme: light;
+}
+
+:host {
+  display: block;
+  width: 100vw;
+  min-height: 100vh;
+}
 .container {
   padding: 22px 22px 40px;
   min-height: calc(100vh - 86px);
@@ -76,6 +102,7 @@ width: 100%;
   font-size: 18px;
   font-weight: 900;
   letter-spacing: 0.2px;
+  color: #13b729;
 }
 
 .welcome-text {
@@ -197,7 +224,7 @@ width: 100%;
    ========================================================= */
 
 .form-card {
-  background: rgba(255,255,255,0.06);
+  background: rgba(195, 122, 218, 0.06);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 18px;
   padding: 16px;
@@ -347,7 +374,7 @@ width: 100%;
 }
 
 .event-card {
-  background: rgba(255,255,255,0.06);
+  background: rgba(61, 2, 54, 0.808);
   border: 1px solid rgba(255,255,255,0.10);
   border-radius: 18px;
   padding: 14px;
@@ -390,28 +417,28 @@ width: 100%;
   border-radius: 999px;
   font-size: 11px;
   font-weight: 900;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(237, 231, 231, 0.12);
+  background: rgba(231, 223, 223, 0.06);
   color: rgba(255,255,255,0.85);
 }
 
 .chip-type {
-  border-color: rgba(236,72,153,0.35);
-  background: rgba(236,72,153,0.12);
+  border-color: rgba(31, 161, 216, 0.35);
+  background: rgba(31, 161, 216, 0.35);
 }
 
 /* timeline chip variants */
 .chip-upcoming {
-  border-color: rgba(96,165,250,0.40);
-  background: rgba(96,165,250,0.12);
+  border-color: rgba(231, 240, 57, 0.4);
+  background: rgba(231, 240, 57, 0.4);
 }
 .chip-ongoing {
-  border-color: rgba(251,191,36,0.40);
-  background: rgba(251,191,36,0.12);
+  border-color: rgba(226, 128, 16, 0.4);
+  background: rgba(226, 128, 16, 0.4);
 }
 .chip-completed {
-  border-color: rgba(52,211,153,0.40);
-  background: rgba(52,211,153,0.12);
+  border-color: rgba(10, 218, 76, 0.4);
+  background: rgba(10, 218, 76, 0.4);
 }
 
 .event-meta {
@@ -432,13 +459,13 @@ width: 100%;
 }
 
 .meta-label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.55);
+  font-size: 14px;
+  color: rgba(250, 250, 250, 0.877);
   font-weight: 800;
 }
 
 .meta-value {
-  font-size: 11px;
+  font-size: 14px;
   color: rgba(255,255,255,0.90);
   font-weight: 900;
 }
@@ -724,4 +751,236 @@ width: 100%;
 .grid-form select,
 .template-staff {
   color-scheme: dark;
+}
+
+
+/* =========================================================
+   ✅ DAY MODE: Make cards visible (white/blue + white/grey)
+   Paste at END of planner-dashboard.component.css
+   ========================================================= */
+
+:host.day {
+  /* slightly richer background */
+  --bg: #f5f8ff;
+  --bg2: #eef2ff;
+
+  /* readable text */
+  --text: rgba(15, 23, 42, 0.92);
+  --muted: rgba(15, 23, 42, 0.65);
+  --muted2: rgba(15, 23, 42, 0.45);
+
+  /* borders */
+  --stroke: rgba(15, 23, 42, 0.12);
+  --stroke2: rgba(15, 23, 42, 0.18);
+
+  color-scheme: light;
+}
+
+/* ===== Container: keep gradient but increase contrast slightly ===== */
+:host.day .container{
+  background:
+    radial-gradient(1200px 600px at 20% 0%,
+      rgba(123,63,228,0.14),
+      transparent 58%),
+    radial-gradient(900px 500px at 85% 25%,
+      rgba(56,189,248,0.12),
+      transparent 60%),
+    linear-gradient(180deg, var(--bg) 0%, var(--bg2) 100%) !important;
+  color: var(--text);
+}
+
+/* ===== Top bar: white glass ===== */
+:host.day .top-bar{
+  background: rgba(255,255,255,0.82) !important;
+  border-bottom: 1px solid rgba(15,23,42,0.10) !important;
+  backdrop-filter: blur(16px);
+}
+
+/* ===== Nav buttons: white-grey with clear contrast ===== */
+:host.day .nav-btn{
+  background: rgba(15,23,42,0.05) !important;
+  border-color: rgba(15,23,42,0.14) !important;
+  color: rgba(15,23,42,0.88) !important;
+}
+:host.day .nav-btn.active{
+  background: rgba(123,63,228,0.12) !important;
+  border-color: rgba(123,63,228,0.45) !important;
+}
+:host.day .welcome-text{
+  color: rgba(15,23,42,0.60) !important;
+}
+
+/* ===== Section card: solid white with subtle blue edge ===== */
+:host.day .section-card{
+  background: rgba(255,255,255,0.92) !important;
+  border: 1px solid rgba(15,23,42,0.10) !important;
+  box-shadow: 0 18px 45px rgba(15,23,42,0.10) !important;
+}
+
+/* ===== Form card: slightly tinted so it stands out from section ===== */
+:host.day .form-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(240,246,255,0.92)) !important;
+  border: 1px solid rgba(15,23,42,0.10) !important;
+  box-shadow: 0 10px 26px rgba(15,23,42,0.08) !important;
+}
+:host.day .form-card h3{
+  color: rgba(15,23,42,0.88) !important;
+}
+
+/* ===== Inputs: white with clear border ===== */
+:host.day .grid-form input,
+:host.day .grid-form select,
+:host.day .grid-form textarea,
+:host.day .budget-input{
+  background: rgba(255,255,255,0.96) !important;
+  border: 1px solid rgba(15,23,42,0.14) !important;
+  color: rgba(15,23,42,0.90) !important;
+}
+:host.day .grid-form input::placeholder,
+:host.day .grid-form textarea::placeholder{
+  color: rgba(15,23,42,0.45) !important;
+}
+
+/* ===== Toggle buttons (Cards/Table) ===== */
+:host.day .view-toggle{
+  background: rgba(15,23,42,0.04) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+}
+:host.day .toggle-btn{
+  color: rgba(15,23,42,0.78) !important;
+}
+:host.day .toggle-btn.active{
+  background: rgba(255,255,255,0.95) !important;
+  border-color: rgba(15,23,42,0.14) !important;
+}
+
+/* ===== Event cards: WHITE-GREY with visible separation ===== */
+:host.day .event-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,246,252,0.92)) !important;
+  border: 1px solid rgba(15,23,42,0.10) !important;
+  box-shadow: 0 16px 40px rgba(15,23,42,0.10) !important;
+}
+:host.day .event-card:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 22px 60px rgba(15,23,42,0.14) !important;
+}
+
+/* Text inside cards */
+:host.day .event-title{
+  color: rgba(15,23,42,0.92) !important;
+}
+:host.day .event-desc{
+  color: rgba(15,23,42,0.70) !important;
+}
+
+/* Meta block inside card */
+:host.day .event-meta{
+  background: rgba(15,23,42,0.03) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+}
+:host.day .meta-label{
+  color: rgba(15,23,42,0.55) !important;
+}
+:host.day .meta-value{
+  color: rgba(15,23,42,0.88) !important;
+}
+
+/* Payment block */
+:host.day .event-finance{
+  background: rgba(15,23,42,0.03) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+}
+:host.day .mini-label{
+  color: rgba(15,23,42,0.55) !important;
+}
+:host.day .mini-value{
+  color: rgba(15,23,42,0.88) !important;
+}
+
+/* ===== Chips: keep your style but readable on light ===== */
+:host.day .chip{
+  background: rgba(15,23,42,0.04) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+  color: rgba(15,23,42,0.80) !important;
+}
+:host.day .chip-type{
+  background: rgba(236,72,153,0.10) !important;
+  border-color: rgba(236,72,153,0.28) !important;
+}
+
+/* ===== Table: make it clearly visible ===== */
+:host.day .data-table{
+  background: rgba(255,255,255,0.95) !important;
+  border-color: rgba(15,23,42,0.10) !important;
+}
+:host.day .data-table th{
+  background: rgba(15,23,42,0.04) !important;
+  color: rgba(15,23,42,0.72) !important;
+  border-bottom-color: rgba(15,23,42,0.10) !important;
+}
+:host.day .data-table td{
+  color: rgba(15,23,42,0.86) !important;
+  border-bottom-color: rgba(15,23,42,0.08) !important;
+}
+
+/* ===== Select dropdown options: light palette in day mode ===== */
+:host.day .grid-form select,
+:host.day .template-staff{
+  color-scheme: light;
+}
+:host.day .grid-form select option,
+:host.day .template-staff option{
+  background: #ffffff !important;
+  color: rgba(15,23,42,0.92) !important;
+}
+
+
+/* =========================================================
+   ✅ DAY MODE: Fix Profile tab stats not visible
+   ========================================================= */
+
+/* Profile card container */
+:host.day .profile-card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(240,246,255,0.92)) !important;
+  border: 1px solid rgba(15,23,42,0.10) !important;
+  box-shadow: 0 18px 45px rgba(15,23,42,0.10) !important;
+}
+
+/* Profile text */
+:host.day .profile-name{
+  color: rgba(15,23,42,0.92) !important;
+}
+:host.day .profile-meta{
+  color: rgba(15,23,42,0.62) !important;
+}
+
+/* Stats grid (the part that looks blank) */
+:host.day .profile-stats{
+  margin-top: 14px;
+}
+
+/* Each stat card */
+:host.day .stat{
+  background: rgba(255,255,255,0.95) !important;
+  border: 1px solid rgba(15,23,42,0.10) !important;
+  box-shadow: 0 10px 22px rgba(15,23,42,0.06) !important;
+}
+
+/* Labels + values (MOST IMPORTANT) */
+:host.day .stat-label{
+  color: rgba(15,23,42,0.60) !important;
+}
+:host.day .stat-value{
+  color: rgba(15,23,42,0.92) !important;
+}
+
+/* If any icons/stars are appearing faded */
+:host.day .stat-value,
+:host.day .stat-value *{
+  opacity: 1 !important;
+}
+
+/* Extra: ensure section heading is visible */
+:host.day .section-card h2{
+  color: rgba(15,23,42,0.92) !important;
 }

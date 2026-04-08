@@ -13,6 +13,19 @@
     <button class="nav-btn" [class.active]="activeTab==='my'" type="button" (click)="setTab('my')">My Events</button>
     <button class="nav-btn" [class.active]="activeTab==='requests'" type="button" (click)="setTab('requests')">Your Requests</button>
     <button class="nav-btn" [class.active]="activeTab==='profile'" type="button" (click)="setTab('profile')">Profile</button>
+
+    <!-- ✅ Theme Toggle -->
+    <button
+      type="button"
+      class="theme-toggle"
+      (click)="toggleTheme()"
+      [attr.aria-label]="currentTheme === 'night' ? 'Switch to day mode' : 'Switch to night mode'">
+      <span class="theme-thumb" [ngClass]="currentTheme">
+        <span class="theme-icon" *ngIf="currentTheme === 'night'">🌙</span>
+        <span class="theme-icon" *ngIf="currentTheme === 'day'">☀</span>
+      </span>
+    </button>
+
     <button class="logout-btn" type="button" (click)="logout()">Logout</button>
   </div>
 </div>
@@ -79,7 +92,7 @@
             </button>
 
             <small class="hint" *ngIf="!canGiveFeedback(event)">
-              Feedback enabled only after completion & only for your agreed events
+              Feedback enabled only after completion &amp; only for your agreed events
             </small>
           </td>
         </tr>
@@ -288,8 +301,7 @@
             [class.selected]="feedbackForm.get('rating')?.value === r.value"
             (click)="setRating(r.value)"
             [attr.aria-label]="r.label"
-            title="{{ r.label }}"
-          >
+            title="{{ r.label }}">
             {{ r.emoji }}
           </button>
         </div>

@@ -1,10 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { StaffService } from '../../services/staff.service';
 import { Task } from '../../models/task.model';
 
-type StaffTab = 'tasks'; 
+type StaffTab = 'tasks';
 
 @Component({
   selector: 'app-staff-dashboard',
@@ -12,6 +12,10 @@ type StaffTab = 'tasks';
   styleUrls: ['./staff-dashboard.component.css']
 })
 export class StaffDashboardComponent implements OnInit {
+
+  // ✅ Theme applied on component host (no wrapper needed)
+  @HostBinding('class') hostThemeClass = 'night';
+  currentTheme: 'day' | 'night' = 'night';
 
   staffId!: number;
   username!: string;
@@ -27,6 +31,9 @@ export class StaffDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // ✅ Theme init (does NOT affect business logic)
+    this.initTheme();
+
     const id = localStorage.getItem('user_id');
     if (!id) {
       this.router.navigate(['/login']);
@@ -39,6 +46,19 @@ export class StaffDashboardComponent implements OnInit {
     this.loadTasks();
   }
 
+  // ✅ Theme helpers (ADD only)
+  private initTheme(): void {
+    const saved = (localStorage.getItem('dashboard_theme') || 'night') as 'day' | 'night';
+    this.currentTheme = saved === 'day' ? 'day' : 'night';
+    this.hostThemeClass = this.currentTheme;
+  }
+
+  toggleTheme(): void {
+    this.currentTheme = this.currentTheme === 'night' ? 'day' : 'night';
+    this.hostThemeClass = this.currentTheme;
+    localStorage.setItem('dashboard_theme', this.currentTheme);
+  }
+
   setTab(tab: StaffTab): void {
     this.activeTab = tab;
     if (tab === 'tasks') this.loadTasks();
@@ -47,7 +67,6 @@ export class StaffDashboardComponent implements OnInit {
   loadTasks(): void {
     this.loading = true;
 
-  
     this.staffService.getAssignedTasks(this.staffId).subscribe({
       next: (data: Task[]) => {
         this.tasks = data || [];
@@ -59,14 +78,21 @@ export class StaffDashboardComponent implements OnInit {
     });
   }
 
-  updateStatus(task: Task, status: string): void {
-    if (!task?.id) return;
+ updateStatus(task: Task, status: string): void {
+  if (!task?.id) return;
 
-    this.staffService.updateTaskStatus(task.id, status).subscribe({
-      next: () => this.loadTasks(),
-      error: () => {}
-    });
-  }
+  // Optimistic UI update so buttons change immediately
+  const prev = task.status;
+  task.status = status;
+
+  this.staffService.updateTaskStatus(task.id, status).subscribe({
+    next: () => this.loadTasks(),
+    error: () => {
+      // rollback if failed
+      task.status = prev;
+    }
+  });
+}
 
   logout(): void {
     localStorage.clear();

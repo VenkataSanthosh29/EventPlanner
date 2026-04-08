@@ -29,7 +29,7 @@ public class ClientProfileController {
             throw new RuntimeException("User is not a client");
         }
 
-        long acceptedCount = requestRepository.countByClientIdAndStatus(clientId, "ACCEPTED");
+        long acceptedCount = requestRepository.countByClientIdAndStatus(clientId, "AGREED");
 
         ClientProfileDto dto = new ClientProfileDto(
                 user.getId(),

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostBinding } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -16,10 +16,14 @@ type ClientTab = 'all' | 'my' | 'requests' | 'profile';
 })
 export class ClientDashboardComponent implements OnInit {
 
+  // ✅ Theme applied on component host (no wrapper needed)
+  @HostBinding('class') hostThemeClass = 'night';
+  currentTheme: 'day' | 'night' = 'night';
+
   username!: string;
   clientId!: number;
 
-  //  unified tab state
+  // unified tab state
   activeTab: ClientTab = 'all';
 
   // Data
@@ -27,10 +31,10 @@ export class ClientDashboardComponent implements OnInit {
   myEvents: Event[] = [];
   myRequests: EventRequest[] = [];
 
-  //  eligible events (only from AGREED requests)
+  // eligible events (only from AGREED requests)
   eligibleEventIds = new Set<number>();
 
-  //  payments (for Pay Now)
+  // payments (for Pay Now)
   payments: Payment[] = [];
   paymentByEventId = new Map<number, Payment>();
 
@@ -64,6 +68,9 @@ export class ClientDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // ✅ Theme init (does not affect business logic)
+    this.initTheme();
+
     this.username = localStorage.getItem('username') || 'User';
     this.clientId = Number(localStorage.getItem('user_id'));
 
@@ -75,7 +82,20 @@ export class ClientDashboardComponent implements OnInit {
     this.loadAllData();
   }
 
-  //  clean tab switch
+  // ✅ Theme helpers (ADD only)
+  private initTheme(): void {
+    const saved = (localStorage.getItem('dashboard_theme') || 'night') as 'day' | 'night';
+    this.currentTheme = saved === 'day' ? 'day' : 'night';
+    this.hostThemeClass = this.currentTheme;
+  }
+
+  toggleTheme(): void {
+    this.currentTheme = this.currentTheme === 'night' ? 'day' : 'night';
+    this.hostThemeClass = this.currentTheme;
+    localStorage.setItem('dashboard_theme', this.currentTheme);
+  }
+
+  // clean tab switch
   setTab(tab: ClientTab): void {
     this.activeTab = tab;
     this.cancelEdit();
